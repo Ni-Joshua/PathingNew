@@ -11,7 +11,7 @@ public class MapReader {
 
     public MapTile[][][] readImageMap(String folderPath){
         File mall = new File(folderPath + "//Floors"); 
-        ObjectMapper mapper = new ObjectMapper();
+        // ObjectMapper mapper = new ObjectMapper();
 
         // File[] info = mall.listFiles(); 
 

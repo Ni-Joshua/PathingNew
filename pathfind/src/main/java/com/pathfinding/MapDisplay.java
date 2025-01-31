@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GradientPaint;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -57,11 +58,14 @@ public class MapDisplay extends JPanel{
         }
     
         if (path != null) {
-            // int colorStep = 
-            g2d.setColor(Color.BLUE);
-            g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL));
+            GradientPaint gradient;
+            int colorStep = 255/path.size();
+            g2d.setColor(new Color(0, 0, 255));
+            g2d.setStroke(new BasicStroke(30));
             for (int i = 0; i< path.size()-1; i++) {
                 if (path.get(i).z == layer){
+                    gradient = new GradientPaint(path.get(i).x, path.get(i).y, new Color(0, i*colorStep, 255), path.get(i+1).x, path.get(i+1).y, new Color(0, (i+1)*colorStep, 255));
+                    g2d.setPaint(gradient);
                     g2d.drawLine(path.get(i).x*cellSize + cellSize/2, path.get(i).y*cellSize + cellSize/2, path.get(i+1).x*cellSize + cellSize/2, path.get(i+1).y*cellSize + cellSize/2);
                     // g.fillRect(node.x * cellSize, node.y * cellSize, cellSize, cellSize);
                 }   
