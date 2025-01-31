@@ -1,12 +1,14 @@
 package com.pathfinding.HelperClasses.MapMats;
 
+import javax.swing.text.DefaultStyledDocument;
+
 /**
  * Object that stores a time in mintes and
  * prints out time in hours and minutes
  */
 public class Time {
     /**Length of time in mintues */
-    private int minutes;
+    private Integer minutes;
 
     /**Creates new Time in minutes */
     public Time(int minutes){
@@ -15,12 +17,17 @@ public class Time {
 
     /**Creates new time from input in mm:ss format */
     public Time(String minAndHours){
-        minutes += Integer.parseInt(minAndHours.substring(0,minAndHours.indexOf(":")))*60;
-        minutes += Integer.parseInt(minAndHours.substring(minAndHours.indexOf(":")+1));
+        if (minAndHours == null){
+            minutes = null;
+        }
+        else{
+            minutes += Integer.parseInt(minAndHours.substring(0,minAndHours.indexOf(":")))*60;
+            minutes += Integer.parseInt(minAndHours.substring(minAndHours.indexOf(":")+1));
+        }
     }
 
     /**@return time in minutes */
-    public int getTimeMinutes(){
+    public Integer getTimeMinutes(){
         return minutes;
     }
 
@@ -29,8 +36,12 @@ public class Time {
         this.minutes = minutes;
     }
 
+    @Override
     /**@return time in hours and minutes */
     public String toString(){
+        if (minutes == null){
+            return "";
+        }
         if (minutes%60 > 9){
             return "" + minutes/60 + ":" + minutes%60;
         } else {

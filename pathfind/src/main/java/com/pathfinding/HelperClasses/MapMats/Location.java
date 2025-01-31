@@ -7,6 +7,11 @@ public class Location {
     private Time openTime;
     private Time closeTime;
 
+    public Location(){
+        name = null;
+        openTime = null;
+        closeTime = null;
+    }
     public Location(String name, Time openTime, Time closeTime){
         this.name = name;
         this.openTime = openTime;
@@ -22,5 +27,10 @@ public class Location {
     }
     public Time getCloseTime(){
         return closeTime;
+    }
+
+    @Override
+    public String toString(){
+        return name + ", Opens: " + openTime + ", Closes: " + closeTime;
     }
 }
