@@ -50,7 +50,6 @@ public class MapDisplay extends JPanel{
                 }else {
                     g2d.setColor(Color.WHITE);
                 }
-                System.out.println(x*cellSize + " " + y*cellSize);
                 g2d.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 g2d.setColor(Color.GRAY);
                 g2d.drawRect(x* cellSize, y * cellSize, cellSize, cellSize);
@@ -61,7 +60,7 @@ public class MapDisplay extends JPanel{
             GradientPaint gradient;
             int colorStep = 255/path.size();
             g2d.setColor(new Color(0, 0, 255));
-            g2d.setStroke(new BasicStroke(30));
+            g2d.setStroke(new BasicStroke(cellSize/4));
             for (int i = 0; i< path.size()-1; i++) {
                 if (path.get(i).z == layer){
                     gradient = new GradientPaint(path.get(i).x, path.get(i).y, new Color(0, i*colorStep, 255), path.get(i+1).x, path.get(i+1).y, new Color(0, (i+1)*colorStep, 255));

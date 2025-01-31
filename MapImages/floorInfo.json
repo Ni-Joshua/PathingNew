@@ -1,0 +1,43 @@
+{
+    "LocMapping": {
+        "ah": {
+            "name": "ah",
+            "openTime": null,
+            "closeTime": null
+        },
+        "bh": {
+            "name": "bh",
+            "openTime": null,
+            "closeTime": null
+        },
+        "mall": {
+            "name": "mall",
+            "openTime": null,
+            "closeTime": null
+        }
+    },
+    "VMmapping": {
+        "vm1": {
+            "connectedTiles": [
+                "vm2"
+            ],
+            "orientation": 2
+        },
+        "vm2": {
+            "connectedTiles": [
+                "vm1"
+            ],
+            "orientation": 1
+        }
+    },
+    "ColorMapping": {
+        "000000": "wall",
+        "FFFFFF": "blank",
+        "FFF200": "e ah",
+        "22B14C": "e bh",
+        "B97A57": "e mall",
+        "00A2E8": "ah",
+        "ED1C24": "bh",
+        "FFAEC9": "vm1"
+    }
+}
