@@ -1,7 +1,5 @@
 package com.pathfinding.HelperClasses.MapMats;
 
-import javax.swing.text.DefaultStyledDocument;
-
 /**
  * Object that stores a time in mintes and
  * prints out time in hours and minutes
@@ -15,12 +13,13 @@ public class Time {
         this.minutes = minutes;
     }
 
-    /**Creates new time from input in mm:ss format */
+    /**Creates new time from input in hh:mm format */
     public Time(String minAndHours){
         if (minAndHours == null){
             minutes = null;
         }
         else{
+            minutes = 0;
             minutes += Integer.parseInt(minAndHours.substring(0,minAndHours.indexOf(":")))*60;
             minutes += Integer.parseInt(minAndHours.substring(minAndHours.indexOf(":")+1));
         }

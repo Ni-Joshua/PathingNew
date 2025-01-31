@@ -45,14 +45,16 @@ public class GeneralMap {
      */
     private void constructCoords() {
         nameToEntrances = new HashMap<>();
-        locToName = new HashMap<>();
+        moverCoords = new HashMap<>();
         for (int z = 0; z < map.length; z++) {
             for (int y = 0; y < map[z].length; y++) {
                 for (int x = 0; x < map[z][y].length; x++) {
+
+                    // Checking if tile is entrance
                     if (map[z][y][x].getTileType().equals("entrance")) {
                         Location loc = map[z][y][x].getLocation();
                         String name = locToName.get(loc);
-                        if (name == null) {
+                        if (name == null) { // Adds appropriate items to locToName
                             name = loc.getName();
                             locToName.put(loc, name);
                         }
@@ -62,32 +64,66 @@ public class GeneralMap {
                         }
                         int[] coords = { z, y, x };
                         currentCoords.add(coords);
-                        nameToEntrances.put(name, currentCoords);
-                    } else if (map[z][y][x].getTileType().equals("verticalmover")) {
+                        nameToEntrances.put(name, currentCoords); // Adds appropriate items to nameToEntrances
+
+                    }
+                    // Checking if tile is vertical mover
+                    else if (map[z][y][x].getTileType().equals("verticalmover")) {
                         int[] coords = { z, y, x };
-                        moverCoords.put(map[z][y][x], coords);
+                        moverCoords.put(map[z][y][x], coords); // Adds appropriate items to moverCoords
                     }
                 }
             }
         }
     }
 
+    /**
+     * Returns the tile at a coordinate
+     * 
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z coordinate
+     * @return tile at the coordinate
+     */
     public MapTile getTile(int x, int y, int z) {
-        return map[x][y][z];
+        return map[z][y][x];
     }
 
+    /**
+     * Returns array representing mall map
+     * 
+     * @return the mall map
+     */
     public MapTile[][][] getMap() {
         return map;
     }
 
+    /**
+     * Returns the coordinates of the entrances of a location
+     * 
+     * @param l1 location
+     * @return coordiantes of the entrances
+     */
     public List<int[]> getCoords(Location l1) {
         return nameToEntrances.get(locToName.get(l1));
     }
 
+    /**
+     * Returns coordinates of the entrances of a location by name
+     * 
+     * @param name of locaiton
+     * @return coordinates of entrances
+     */
     public List<int[]> getCoords(String name) {
         return nameToEntrances.get(name);
     }
 
+    /**
+     * Returns coordinates of the locaitons where a vertical mover can be accessed
+     * 
+     * @param tile vertical mover
+     * @return coordinates of connected vertical mover tiles
+     */
     public int[] getMoverCoords(VerticalMoverTile tile) {
         return moverCoords.get(tile);
     }
