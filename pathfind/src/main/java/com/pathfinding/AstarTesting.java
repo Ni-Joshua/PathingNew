@@ -14,10 +14,10 @@ public class AstarTesting{
         Location ah = new Location ("AH", null, null);
         Location bh = new Location("BH", null, null);
         Location ch = new Location("CH", null, null);
-        VerticalMoverTile ev2 = new VerticalMoverTile(null, 2);
+        VerticalMoverTile ev2 = new VerticalMoverTile(null);
         List<VerticalMoverTile> l1 = new LinkedList<>();
         l1.add(ev2);
-        VerticalMoverTile ev1 = new VerticalMoverTile(l1, 2);
+        VerticalMoverTile ev1 = new VerticalMoverTile(l1);
 
         // grid = new int[][] {
         //     {0, 0, 0, 0, 0},

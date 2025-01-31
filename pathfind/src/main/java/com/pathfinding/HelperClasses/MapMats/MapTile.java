@@ -2,47 +2,86 @@ package com.pathfinding.HelperClasses.MapMats;
 
 import java.util.List;
 
+/**
+ * Map Tiles are tiles on a mall map, which can by locations, entrances, etc.
+ * 
+ * @author Joshua Ni
+ * @author Justin Ely
+ */
 public class MapTile {
+    /** Can you walk through the tile? */
     private boolean passable;
+    /** Can you pathfind to the location? */
     private boolean selectable;
+    /** Name of the type of the tile */
     private String tileType;
 
-    public MapTile(){
+    /**
+     * Initializes new empty map tile
+     */
+    public MapTile() {
         passable = true;
         selectable = true;
         tileType = "blank";
     }
-    public MapTile(boolean pass, boolean selec, String type){
-        passable = pass;
-        selectable = selec;
-        tileType = type;
+
+    /**
+     * Initializes new tile with certain properties
+     * 
+     * @param passable
+     * @param selectable
+     * @param tileType
+     */
+    public MapTile(boolean passable, boolean selectable, String tileType) {
+        this.passable = passable;
+        this.selectable = selectable;
+        this.tileType = tileType;
     }
 
-    public boolean isPassable(){
+    /**
+     * Returns whether a tile is passable
+     * 
+     * @return whether tile is passable
+     */
+    public boolean isPassable() {
         return passable;
     }
 
-    public boolean isSelectable(){
+    /**
+     * Returns whether a tile is selectable
+     * 
+     * @return whether tile is selectable
+     */
+    public boolean isSelectable() {
         return selectable;
     }
 
-    public String getTileType(){
+    /**
+     * Returns tile type
+     * 
+     * @return tyle of tile
+     */
+    public String getTileType() {
         return tileType;
     }
 
-    //temporary fix
-    public Location getLocation(){
+    /**
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     * 
+     * ALL OF THE METHODS BELOW ARE TO BE IMPLEMENTED IN CHILD CLASSES
+     * THE METHODS MAKE POLYMORPHISM POSSIBLE
+     * 
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     */
+
+    public Location getLocation() {
         return null;
     }
 
-    public List<VerticalMoverTile> getConnected(){
+    public List<VerticalMoverTile> getConnected() {
         return null;
     }
 
-    public int getOrientation(){
-        return 0;
-    }
-
-    public void setConnected(List<VerticalMoverTile> connected){
+    public void setConnected(List<VerticalMoverTile> connected) {
     }
 }

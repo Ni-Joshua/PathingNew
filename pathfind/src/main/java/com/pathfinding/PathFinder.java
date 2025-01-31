@@ -14,14 +14,27 @@ import java.util.TreeMap;
 
 import com.pathfinding.HelperClasses.MapMats.*;
 
-//Incomplete
+/**
+ * Object that pathfinds between two points on a given GeneralMap
+ * Makes use of the A* pathfinding algorithm to find a path
+ * 
+ * @author Justin Ely
+ * @author Joshua Ni
+ */
 public class PathFinder {
+    /** Map that the pathfinder pathfinds on */
     private GeneralMap map;
+    /** Directions that the pathfinder can move */
     private static final int[][] DIRECTIONS = { // Possible movement directions
             { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 }// , {1, 1}, {1, -1}, {-1, 1}, {-1, -1} these are for diagonal
                                                     // movement
     };
 
+    /**
+     * Instantiates new pathfinder with a given map
+     * 
+     * @param map General Map
+     */
     public PathFinder(GeneralMap map) {
         this.map = map;
     }
@@ -40,7 +53,7 @@ public class PathFinder {
     }
 
     /**
-     * Pathfind between two locations by their
+     * Pathfind between two locations by their names
      * 
      * @param S1 location name 1
      * @param S2 location name 2
