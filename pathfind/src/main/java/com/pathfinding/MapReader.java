@@ -90,7 +90,7 @@ public class MapReader {
                         }
                         colorMapping.put(key, hex);
                     }
-                    if (tileType.contains(" ") && tileType.substring(0, tileType.indexOf(" ")).equals("ent") && !colorMapping.containsKey(tileType)){
+                    if (tileType.contains(" ") && tileType.substring(0, tileType.indexOf(" ")).equals("ent") && !colorMapping.containsKey(tileType.substring(tileType.indexOf(" ") + 1))){
                         colorMapping.put(tileType.substring(tileType.indexOf(" ") + 1), hex);
                     }
                     // System.out.println(z + " " + y + " " + x + ": " + tileType);
