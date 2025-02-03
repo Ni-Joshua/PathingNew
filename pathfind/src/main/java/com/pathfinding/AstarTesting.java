@@ -129,6 +129,7 @@ public class AstarTesting {
             JScrollPane scroll = new JScrollPane(panel);
             frame.add(scroll);
             frame.setVisible(true);
+            
         } catch (Exception e) {
             System.out.println(e);
         }
