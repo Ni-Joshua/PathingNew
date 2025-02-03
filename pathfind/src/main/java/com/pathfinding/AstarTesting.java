@@ -1,15 +1,28 @@
 package com.pathfinding;
 
-import com.pathfinding.HelperClasses.MapMats.*;
-import com.pathfinding.HelperClasses.*;
-import java.util.LinkedList;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.Flow;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+
+import com.pathfinding.HelperClasses.GeneralMap;
+import com.pathfinding.HelperClasses.MapMats.Location;
+import com.pathfinding.HelperClasses.MapMats.MapTile;
+import com.pathfinding.HelperClasses.MapMats.VerticalMoverTile;
 
 public class AstarTesting {
     public static void main(String[] args) {
@@ -55,35 +68,66 @@ public class AstarTesting {
 
         MapTile[][][] grid = null;
         try {
-            grid = reader.readImageMap("PathingNew\\MapImages");
+            grid = reader.readImageMap("MapImages");
             TreeMap<String, Location> locMapping = reader.getLocMapping();
             TreeMap<String, VerticalMoverTile> vmMapping = reader.getVMMapping();
             TreeMap<String, String> colorMapping = reader.getColorMapping();
 
             GeneralMap testMap = new GeneralMap(grid);
             PathFinder p = new PathFinder(testMap);
-            Location loc1 = locMapping.get("ah");
-            Location loc2 = locMapping.get("fh");
+            Location loc1 = locMapping.get("mdl");
+            Location loc2 = locMapping.get("foodcourt");
 
             List<Node> pathFromAC = p.pathfind(loc1, loc2);
 
             JFrame frame = new JFrame("A* Pathfinding Visualization");
-            frame.setSize(1000, 1000);
+            frame.setSize(1250, 750);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            JTabbedPane panels = new JTabbedPane();
+            // JTabbedPane panels = new JTabbedPane();
 
+            // for (int i = 0; i < grid.length; i++) {
+            //     JPanel tab = new JPanel();
+            //     tab.setLayout(new GridLayout(2,1));
+            //     // create the color information panel
+            //     JPanel colorInfoPanel = createColorInfoPanel();
+            //     tab.add(colorInfoPanel); 
+            //     if (i == testMap.getCoords(loc1).get(0)[0] || i == testMap.getCoords(loc2).get(0)[0]) {
+            //         tab.add(new MapDisplay(grid[i], pathFromAC, i, 500, 500, colorMapping));
+            //     } else {
+            //         tab.add(new MapDisplay(grid[i], null, i, 500, 500, colorMapping));
+            //     }
+
+            //     // System.out.println(Arrays.deepToString(grid[i]));
+            //     panels.addTab("Floor " + (i+1), tab);
+            // }
+            // frame.add(panels);
+            // frame.setVisible(true);
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+            JPanel infoPanel = createInfoPanel();
+            panel.add(infoPanel);
+
+            JPanel t = new JPanel();
+            t.setLayout(new FlowLayout());
+            t.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+ 
             for (int i = 0; i < grid.length; i++) {
+                // create the color information panel
                 JPanel tab = new JPanel();
+                tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
+                JLabel floor = new JLabel("Floor " + (i+1));
+                tab.add(floor);
                 if (i == testMap.getCoords(loc1).get(0)[0] || i == testMap.getCoords(loc2).get(0)[0]) {
-                    tab.add(new MapDisplay(grid[i], pathFromAC, i, 500, 500, colorMapping));
+                    tab.add(new MapDisplay(grid[i], pathFromAC, i, 300, 300, colorMapping));
                 } else {
-                    tab.add(new MapDisplay(grid[i], null, i, 500, 500, colorMapping));
+                    tab.add(new MapDisplay(grid[i], null, i, 300, 300, colorMapping));
                 }
-
+                t.add(tab);
                 // System.out.println(Arrays.deepToString(grid[i]));
-                panels.addTab("Floor " + (i+1), tab);
             }
-            frame.add(panels);
+            panel.add(t);
+            JScrollPane scroll = new JScrollPane(panel);
+            frame.add(scroll);
             frame.setVisible(true);
         } catch (Exception e) {
             System.out.println(e);
@@ -101,5 +145,19 @@ public class AstarTesting {
         // }
 
     }
+
+    private static JPanel createInfoPanel()
+  {
+    // create a color info panel
+    JPanel colorInfoPanel = new JPanel();
+    colorInfoPanel.setLayout(new FlowLayout());
+    colorInfoPanel.setBorder(new LineBorder(Color.black,1));
+
+    // create the sample color panel and label
+    JLabel colorLabel = new JLabel("Info: ");
+
+    colorInfoPanel.add(colorLabel);    
+    return colorInfoPanel; 
+  }
 
 }
