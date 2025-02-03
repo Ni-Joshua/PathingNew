@@ -62,8 +62,8 @@ public class AstarTesting {
 
             GeneralMap testMap = new GeneralMap(grid);
             PathFinder p = new PathFinder(testMap);
-            Location loc1 = locMapping.get("ah");
-            Location loc2 = locMapping.get("fh");
+            Location loc1 = locMapping.get("mdl");
+            Location loc2 = locMapping.get("mall");
 
             List<Node> pathFromAC = p.pathfind(loc1, loc2);
 
