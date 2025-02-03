@@ -49,11 +49,7 @@ public class PathFinder {
     public List<Node> pathfind(Location L1, Location L2) {
         int[] entranceStart = ((LinkedList<int[]>) map.getCoords(L1)).get(0);
         List<int[]> endCoords = ((LinkedList<int[]>) map.getCoords(L2));
-        List<Node> endNodes = new ArrayList<>();
-        for (int[] arr : endCoords){
-            endNodes.add(new Node(arr[2], arr[1], arr[0]));
-        }
-        return findPathByLayer(new Node(entranceStart[2], entranceStart[1], entranceStart[0]), endNodes, 0);
+        return pathfind(entranceStart, endCoords);
     }
 
     /**
@@ -73,29 +69,36 @@ public class PathFinder {
      * Finds a path between two coordinate positions (3D)
      * Returns list of nodes representing the path between the positions
      * 
-     * @param pos1 starting position
-     * @param pos2 ending position
+     * @param starting starting position
+     * @param endings ending position
      * @return list of nodes representing the path
      */
-    // private List<Node> pathfind(int[] pos1, int[] pos2) {
-    //     List<Node> totalPath = new ArrayList<>();
+    private List<Node> pathfind(int[] starting, List<int[]> endings) {
+        List<Node> totalPath = new ArrayList<>();
+        List<Node> endNodes = new ArrayList<>();
 
-    //     if (pos1[0] != pos2[0]) {
-    //         VerticalMoverTile mover = findNearestVerticalMover(pos1);
-    //         int[] end1Pos = findAppropriateVerticalMoverPosition(mover, pos1);
-    //         totalPath.addAll(findPathByLayer(new Node(pos1[2], pos1[1], pos1[0]),
-    //                 new Node(end1Pos[2], end1Pos[1], pos1[0]), pos1[0]));
+        if (starting[0] != endings.get(0)[0]) {
+            VerticalMoverTile mover = findNearestVerticalMover(starting);
+            int[] end1Pos = findAppropriateVerticalMoverPosition(mover, starting);
+            endNodes.add(new Node(end1Pos[2], end1Pos[1], end1Pos[0]));
+            totalPath.addAll(findPathByLayer(new Node(starting[2], starting[1], starting[0]),
+                endNodes, starting[0]));
 
-    //         int[] start2Pos = findAppropriateVerticalMoverPosition(mover, pos2);
-    //         totalPath.addAll(findPathByLayer(new Node(start2Pos[2], start2Pos[1], pos2[0]),
-    //                 new Node(pos2[2], pos2[1], pos2[0]), pos2[0]));
-    //     } else {
-    //         totalPath.addAll(
-    //                 findPathByLayer(new Node(pos1[2], pos1[1], pos1[0]), new Node(pos2[2], pos2[1], pos1[0]), pos1[0]));
-    //     }
+            endNodes.clear();
+            for (int[] arr : endings){
+                endNodes.add(new Node(arr[2], arr[1], arr[0]));
+            }
 
-    //     return totalPath;
-    // }
+            int[] start2Pos = findAppropriateVerticalMoverPosition(mover, endings.get(0));
+            totalPath.addAll(findPathByLayer(new Node(start2Pos[2], start2Pos[1], endings.get(0)[0]),
+                    endNodes, endings.get(0)[0]));
+        } else {
+            totalPath.addAll(
+                    findPathByLayer(new Node(starting[2], starting[1], starting[0]), endNodes, starting[0]));
+        }
+
+        return totalPath;
+    }
 
     /**
      * Finds the closest vertical mover to a current position
