@@ -55,7 +55,7 @@ public class AstarTesting {
 
         MapTile[][][] grid = null;
         try {
-            grid = reader.readImageMap("MapImages");
+            grid = reader.readImageMap("PathingNew\\MapImages");
             TreeMap<String, Location> locMapping = reader.getLocMapping();
             TreeMap<String, VerticalMoverTile> vmMapping = reader.getVMMapping();
             TreeMap<String, String> colorMapping = reader.getColorMapping();
@@ -63,7 +63,7 @@ public class AstarTesting {
             GeneralMap testMap = new GeneralMap(grid);
             PathFinder p = new PathFinder(testMap);
             Location loc1 = locMapping.get("ah");
-            Location loc2 = locMapping.get("eh");
+            Location loc2 = locMapping.get("fh");
 
             List<Node> pathFromAC = p.pathfind(loc1, loc2);
 

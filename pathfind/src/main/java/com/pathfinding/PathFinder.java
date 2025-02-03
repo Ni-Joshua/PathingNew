@@ -93,6 +93,9 @@ public class PathFinder {
             totalPath.addAll(findPathByLayer(new Node(start2Pos[2], start2Pos[1], endings.get(0)[0]),
                     endNodes, endings.get(0)[0]));
         } else {
+            for (int[] arr : endings) {
+                endNodes.add(new Node(arr[2], arr[1], arr[0]));
+            }
             totalPath.addAll(
                     findPathByLayer(new Node(starting[2], starting[1], starting[0]), endNodes, starting[0]));
         }
