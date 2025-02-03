@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.swing.JPanel;
 
@@ -19,13 +20,16 @@ public class MapDisplay extends JPanel{
     private int xSize;
     private int ySize;
     private int layer;
+    private TreeMap<String, String> colorMapping;
+
     
-    public MapDisplay(MapTile[][] grid, List<Node> path, int layer, int xSize, int ySize){
+    public MapDisplay(MapTile[][] grid, List<Node> path, int layer, int xSize, int ySize, TreeMap<String, String> colorMapping){
         this.grid = grid;
         this.path = path;
         this.layer = layer;
         this.xSize = xSize;
         this.ySize = ySize;
+        this.colorMapping = colorMapping;
         super.setPreferredSize(new Dimension(xSize, ySize));
     }
 
@@ -39,17 +43,37 @@ public class MapDisplay extends JPanel{
         int cellSize = Math.min(xSize/grid[0].length, ySize/grid.length);
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
-                if (grid[y][x].getTileType().equals("wall")) {
-                    g2d.setColor(Color.BLACK);
-                } else if (grid[y][x].getTileType().equals("verticalmover")){
-                    g2d.setColor(Color.pink);
-                } else if (grid[y][x].getTileType().equals("location")){
-                    g2d.setColor(Color.red);
-                } else if (grid[y][x].getTileType().equals("entrance")){
-                    g2d.setColor(Color.green);
-                }else {
-                    g2d.setColor(Color.WHITE);
+                MapTile tile = grid[y][x];
+                String tileType = tile.getTileType();
+                String hex = "";
+                if (tileType.equals("location") || tileType.equals("entrance")){
+                    hex = colorMapping.get(tile.getLocation().getName());
                 }
+                else if (tileType.equals("verticalmover")){
+                    hex = "FFC0CB";
+                }
+                else {
+                    hex = colorMapping.get(tileType);
+                }
+
+                int red = Integer.parseInt(hex.substring(0, 2), 16);
+                int green = Integer.parseInt(hex.substring(2, 4), 16);
+                int blue = Integer.parseInt(hex.substring(4, 6), 16);
+
+                Color color = new Color(red, green, blue);
+
+                // if (grid[y][x].getTileType().equals("wall")) {
+                //     g2d.setColor(Color.BLACK);
+                // } else if (grid[y][x].getTileType().equals("verticalmover")){
+                //     g2d.setColor(Color.pink);
+                // } else if (grid[y][x].getTileType().equals("location")){
+                //     g2d.setColor(Color.red);
+                // } else if (grid[y][x].getTileType().equals("entrance")){
+                //     g2d.setColor(Color.green);
+                // }else {
+                //     g2d.setColor(Color.WHITE);
+                // }
+                g2d.setColor(color);
                 g2d.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
                 // g2d.setColor(Color.GRAY);
                 // g2d.drawRect(x* cellSize, y * cellSize, cellSize, cellSize);
