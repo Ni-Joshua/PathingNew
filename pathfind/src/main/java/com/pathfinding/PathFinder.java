@@ -48,8 +48,12 @@ public class PathFinder {
      */
     public List<Node> pathfind(Location L1, Location L2) {
         int[] entranceStart = ((LinkedList<int[]>) map.getCoords(L1)).get(0);
-        int[] entranceEnd = ((LinkedList<int[]>) map.getCoords(L2)).get(0);
-        return pathfind(entranceStart, entranceEnd);
+        List<int[]> endCoords = ((LinkedList<int[]>) map.getCoords(L2));
+        List<Node> endNodes = new ArrayList<>();
+        for (int[] arr : endCoords){
+            endNodes.add(new Node(arr[2], arr[1], arr[0]));
+        }
+        return findPathByLayer(new Node(entranceStart[2], entranceStart[1], entranceStart[0]), endNodes, 0);
     }
 
     /**
@@ -59,11 +63,11 @@ public class PathFinder {
      * @param S2 location name 2
      * @return list of nodes which is a path between two locations
      */
-    public List<Node> pathfind(String S1, String S2) {
-        int[] entranceStart = ((ArrayList<int[]>) map.getCoords(S1)).get(0);
-        int[] entranceEnd = ((ArrayList<int[]>) map.getCoords(S2)).get(0);
-        return pathfind(entranceStart, entranceEnd);
-    }
+    // public List<Node> pathfind(String S1, String S2) {
+    //     int[] entranceStart = ((ArrayList<int[]>) map.getCoords(S1)).get(0);
+    //     int[] entranceEnd = ((ArrayList<int[]>) map.getCoords(S2)).get(0);
+    //     return pathfind(entranceStart, entranceEnd);
+    // }
 
     /**
      * Finds a path between two coordinate positions (3D)
@@ -73,25 +77,25 @@ public class PathFinder {
      * @param pos2 ending position
      * @return list of nodes representing the path
      */
-    private List<Node> pathfind(int[] pos1, int[] pos2) {
-        List<Node> totalPath = new ArrayList<>();
+    // private List<Node> pathfind(int[] pos1, int[] pos2) {
+    //     List<Node> totalPath = new ArrayList<>();
 
-        if (pos1[0] != pos2[0]) {
-            VerticalMoverTile mover = findNearestVerticalMover(pos1);
-            int[] end1Pos = findAppropriateVerticalMoverPosition(mover, pos1);
-            totalPath.addAll(findPathByLayer(new Node(pos1[2], pos1[1], pos1[0]),
-                    new Node(end1Pos[2], end1Pos[1], pos1[0]), pos1[0]));
+    //     if (pos1[0] != pos2[0]) {
+    //         VerticalMoverTile mover = findNearestVerticalMover(pos1);
+    //         int[] end1Pos = findAppropriateVerticalMoverPosition(mover, pos1);
+    //         totalPath.addAll(findPathByLayer(new Node(pos1[2], pos1[1], pos1[0]),
+    //                 new Node(end1Pos[2], end1Pos[1], pos1[0]), pos1[0]));
 
-            int[] start2Pos = findAppropriateVerticalMoverPosition(mover, pos2);
-            totalPath.addAll(findPathByLayer(new Node(start2Pos[2], start2Pos[1], pos2[0]),
-                    new Node(pos2[2], pos2[1], pos2[0]), pos2[0]));
-        } else {
-            totalPath.addAll(
-                    findPathByLayer(new Node(pos1[2], pos1[1], pos1[0]), new Node(pos2[2], pos2[1], pos1[0]), pos1[0]));
-        }
+    //         int[] start2Pos = findAppropriateVerticalMoverPosition(mover, pos2);
+    //         totalPath.addAll(findPathByLayer(new Node(start2Pos[2], start2Pos[1], pos2[0]),
+    //                 new Node(pos2[2], pos2[1], pos2[0]), pos2[0]));
+    //     } else {
+    //         totalPath.addAll(
+    //                 findPathByLayer(new Node(pos1[2], pos1[1], pos1[0]), new Node(pos2[2], pos2[1], pos1[0]), pos1[0]));
+    //     }
 
-        return totalPath;
-    }
+    //     return totalPath;
+    // }
 
     /**
      * Finds the closest vertical mover to a current position
@@ -113,9 +117,19 @@ public class PathFinder {
         return moversDistances.get(moversDistances.firstKey());
     }
 
-    // private int findNearestEntranceIndex(int[] pos, Location loc){
-    // List<int[]> entrancecoords = (ArrayList<int[]>) map.getCoords(loc);
+    // private Entrance findNearestEntrance(int[] pos, Location loc) {
+    //     TreeMap<Double, VerticalMoverTile> entranceDistances = new TreeMap<Double, VerticalMoverTile>();
+    //     MapTile[][] currentLayer = map.getMap()[pos[0]];
 
+    //     for (int i = 0; i < currentLayer.length; i++) {
+    //         for (int j = 0; j < currentLayer[i].length; j++) {
+    //             if (currentLayer[i][j].getTileType().equals("verticalmover")) {
+    //                 moversDistances.put(distance(new Node(pos[2], pos[1], pos[0]), new Node(j, i, pos[0])),
+    //                         (VerticalMoverTile) currentLayer[i][j]);
+    //             }
+    //         }
+    //     }
+    //     return moversDistances.get(moversDistances.firstKey());
     // }
 
     /**
@@ -147,19 +161,21 @@ public class PathFinder {
      * @param layer the 2D layer of the map that we are pathfinding on
      * @return list of nodes that represents the path between the two points
      */
-    private List<Node> findPathByLayer(Node start, Node end, int layer) {
+    private List<Node> findPathByLayer(Node start, List<Node> endings, int layer) {
         PriorityQueue<Node> unexplored = new PriorityQueue<>(Comparator.comparingDouble(Node::getTotalCost));
         Set<Node> explored = new HashSet<>();
 
         start.startCost = 0;
-        start.endCost = heuristic(start, end);
+        start.endCost = heuristic(start, endings);
         unexplored.add(start);
 
         while (!unexplored.isEmpty()) {
             Node current = unexplored.poll();
 
-            if (current.equals(end)) {
-                return reconstructPath(current);
+            for (Node end : endings) {
+                if (current.equals(end)) {
+                    return reconstructPath(current);
+                }
             }
 
             explored.add(current);
@@ -168,14 +184,14 @@ public class PathFinder {
                 int newX = current.x + direction[0];
                 int newY = current.y + direction[1];
 
-                if (isValid(map.getMap()[layer], newX, newY, end) && !explored.contains(new Node(newX, newY, layer))) {
+                if (isValid(map.getMap()[layer], newX, newY, endings) && !explored.contains(new Node(newX, newY, layer))) {
                     Node neighbor = new Node(newX, newY, layer);
 
                     double tentativeStartCost = current.startCost + distance(current, neighbor);
 
                     if (tentativeStartCost < neighbor.startCost || !unexplored.contains(neighbor)) {
                         neighbor.startCost = tentativeStartCost;
-                        neighbor.endCost = heuristic(neighbor, end);
+                        neighbor.endCost = heuristic(neighbor, endings);
                         neighbor.parent = current;
 
                         if (!unexplored.contains(neighbor)) {
@@ -196,8 +212,14 @@ public class PathFinder {
      * @param b node 2
      * @return manhattan distance between the nodes
      */
-    private static double heuristic(Node a, Node b) {
-        return Math.abs(a.y - b.y) + Math.abs(a.x - b.x); // Manhattan distance
+    private static double heuristic(Node a, List<Node> endings) {
+        double heuristic = Double.MAX_VALUE;
+        double temp = 0;
+        for (Node n : endings) {
+            temp = Math.abs(a.y - n.y) + Math.abs(a.x - n.x);
+            heuristic = Math.min(heuristic, temp);
+        }
+        return heuristic; // Manhattan distance
     }
 
     /**
@@ -223,9 +245,9 @@ public class PathFinder {
      * @param end  ending node
      * @return boolean of whether the node can be moved to
      */
-    private static boolean isValid(MapTile[][] grid, int x, int y, Node end) {
+    private static boolean isValid(MapTile[][] grid, int x, int y, List<Node> endings) {
         return x >= 0 && y >= 0 && x < grid[0].length && y < grid.length && (grid[y][x].isPassable()
-                || (grid[y][x].getTileType().equals("verticalmover") && (new Node(x, y, 0)).equals(end)));
+                || (grid[y][x].getTileType().equals("verticalmover") && endings.contains(new Node(x, y, 0))));
     }
 
     /**

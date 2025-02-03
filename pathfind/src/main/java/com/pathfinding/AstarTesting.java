@@ -54,14 +54,14 @@ public class AstarTesting {
 
         MapTile[][][] grid = null;
         try {
-            grid = reader.readImageMap("MapImages");
+            grid = reader.readImageMap("PathingNew\\MapImages");
             TreeMap<String, Location> locMapping = reader.getLocMapping();
             TreeMap<String, VerticalMoverTile> vmMapping = reader.getVMMapping();
 
             GeneralMap testMap = new GeneralMap(grid);
             PathFinder p = new PathFinder(testMap);
             Location loc1 = locMapping.get("ah");
-            Location loc2 = locMapping.get("ch");
+            Location loc2 = locMapping.get("eh");
 
             List<Node> pathFromAC = p.pathfind(loc1, loc2);
 
@@ -79,7 +79,7 @@ public class AstarTesting {
                 }
 
                 // System.out.println(Arrays.deepToString(grid[i]));
-                panels.addTab("Floor " + (grid.length - i), tab);
+                panels.addTab("Floor " + (i+1), tab);
             }
             frame.add(panels);
             frame.setVisible(true);

@@ -50,7 +50,7 @@ public class GeneralMap {
         for (int z = 0; z < map.length; z++) {
             for (int y = 0; y < map[z].length; y++) {
                 for (int x = 0; x < map[z][y].length; x++) {
-                    System.out.println(z + " " + y + " "+ x);
+                    // System.out.println(z + " " + y + " "+ x);
                     // Checking if tile is entrance
                     if (map[z][y][x].getTileType().equals("entrance")) {
                         Location loc = map[z][y][x].getLocation();
