@@ -32,6 +32,7 @@ import com.pathfinding.HelperClasses.MapMats.WallTile;
 public class MapReader {
     private TreeMap<String, Location> locMapping;
     private TreeMap<String, VerticalMoverTile> vmMapping;
+    private TreeMap<String, String> colorMapping;
 
     public MapTile[][][] readImageMap(String folderPath) throws JsonProcessingException, IOException {
         File mall = new File(folderPath + "\\Floors");
@@ -50,6 +51,7 @@ public class MapReader {
 
         locCreation(locations);
         vmCreation(vMovers);
+        colorMapping = new TreeMap<>();
 
         JsonNode colorMap = info.get("ColorMapping");
 
@@ -75,6 +77,22 @@ public class MapReader {
                     } else {
                         gMap[z][y][x] = new LocationTile(locMapping.get(tileType));
                     }
+                    if (!tileType.contains(" ") && !colorMapping.containsKey(tileType)){
+                        String key = "";
+                        if (tileType.equals("wall")){
+                            key = "wall";
+                        }
+                        else if (tileType.equals("blank")){
+                            key = "blank";
+                        }
+                        else{
+                            key = locMapping.get(tileType).getName();
+                        }
+                        colorMapping.put(key, hex);
+                    }
+                    if (tileType.contains(" ") && tileType.substring(0, tileType.indexOf(" ")).equals("ent") && !colorMapping.containsKey(tileType)){
+                        colorMapping.put(tileType.substring(tileType.indexOf(" ") + 1), hex);
+                    }
                     // System.out.println(z + " " + y + " " + x + ": " + tileType);
                 }
             }
@@ -88,6 +106,10 @@ public class MapReader {
 
     public TreeMap<String, Location> getLocMapping() {
         return locMapping;
+    }
+
+    public TreeMap<String, String> getColorMapping() {
+        return colorMapping;
     }
 
     private void locCreation(JsonNode locations) {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.JFrame;
+
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -54,9 +55,10 @@ public class AstarTesting {
 
         MapTile[][][] grid = null;
         try {
-            grid = reader.readImageMap("PathingNew\\MapImages");
+            grid = reader.readImageMap("MapImages");
             TreeMap<String, Location> locMapping = reader.getLocMapping();
             TreeMap<String, VerticalMoverTile> vmMapping = reader.getVMMapping();
+            TreeMap<String, String> colorMapping = reader.getColorMapping();
 
             GeneralMap testMap = new GeneralMap(grid);
             PathFinder p = new PathFinder(testMap);
@@ -73,9 +75,9 @@ public class AstarTesting {
             for (int i = 0; i < grid.length; i++) {
                 JPanel tab = new JPanel();
                 if (i == testMap.getCoords(loc1).get(0)[0] || i == testMap.getCoords(loc2).get(0)[0]) {
-                    tab.add(new MapDisplay(grid[i], pathFromAC, i, 500, 500));
+                    tab.add(new MapDisplay(grid[i], pathFromAC, i, 500, 500, colorMapping));
                 } else {
-                    tab.add(new MapDisplay(grid[i], null, i, 500, 500));
+                    tab.add(new MapDisplay(grid[i], null, i, 500, 500, colorMapping));
                 }
 
                 // System.out.println(Arrays.deepToString(grid[i]));
