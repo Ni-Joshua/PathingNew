@@ -26,8 +26,8 @@ public class PathFinder {
     private GeneralMap map;
     /** Directions that the pathfinder can move */
     private static final int[][] DIRECTIONS = { // Possible movement directions
-            { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 }// , {1, 1}, {1, -1}, {-1, 1}, {-1, -1} these are for diagonal
-                                                    // movement
+            { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 },
+            { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } // these are for diagonal movement
     };
 
     /**
@@ -59,18 +59,18 @@ public class PathFinder {
      * @param S2 location name 2
      * @return list of nodes which is a path between two locations
      */
-    // public List<Node> pathfind(String S1, String S2) {
-    //     int[] entranceStart = ((ArrayList<int[]>) map.getCoords(S1)).get(0);
-    //     int[] entranceEnd = ((ArrayList<int[]>) map.getCoords(S2)).get(0);
-    //     return pathfind(entranceStart, entranceEnd);
-    // }
+    public List<Node> pathfind(String S1, String S2) {
+        int[] entranceStart = ((LinkedList<int[]>) map.getCoords(S1)).get(0);
+        List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(S2));
+        return pathfind(entranceStart, entranceEnd);
+    }
 
     /**
      * Finds a path between two coordinate positions (3D)
      * Returns list of nodes representing the path between the positions
      * 
      * @param starting starting position
-     * @param endings ending position
+     * @param endings  ending position
      * @return list of nodes representing the path
      */
     private List<Node> pathfind(int[] starting, List<int[]> endings) {
@@ -82,10 +82,10 @@ public class PathFinder {
             int[] end1Pos = findAppropriateVerticalMoverPosition(mover, starting);
             endNodes.add(new Node(end1Pos[2], end1Pos[1], end1Pos[0]));
             totalPath.addAll(findPathByLayer(new Node(starting[2], starting[1], starting[0]),
-                endNodes, starting[0]));
+                    endNodes, starting[0]));
 
             endNodes.clear();
-            for (int[] arr : endings){
+            for (int[] arr : endings) {
                 endNodes.add(new Node(arr[2], arr[1], arr[0]));
             }
 
@@ -119,21 +119,6 @@ public class PathFinder {
         }
         return moversDistances.get(moversDistances.firstKey());
     }
-
-    // private Entrance findNearestEntrance(int[] pos, Location loc) {
-    //     TreeMap<Double, VerticalMoverTile> entranceDistances = new TreeMap<Double, VerticalMoverTile>();
-    //     MapTile[][] currentLayer = map.getMap()[pos[0]];
-
-    //     for (int i = 0; i < currentLayer.length; i++) {
-    //         for (int j = 0; j < currentLayer[i].length; j++) {
-    //             if (currentLayer[i][j].getTileType().equals("verticalmover")) {
-    //                 moversDistances.put(distance(new Node(pos[2], pos[1], pos[0]), new Node(j, i, pos[0])),
-    //                         (VerticalMoverTile) currentLayer[i][j]);
-    //             }
-    //         }
-    //     }
-    //     return moversDistances.get(moversDistances.firstKey());
-    // }
 
     /**
      * Find the position of a vertical mover chain on the floor of a certain
@@ -187,7 +172,8 @@ public class PathFinder {
                 int newX = current.x + direction[0];
                 int newY = current.y + direction[1];
 
-                if (isValid(map.getMap()[layer], newX, newY, endings) && !explored.contains(new Node(newX, newY, layer))) {
+                if (isValid(map.getMap()[layer], newX, newY, endings)
+                        && !explored.contains(new Node(newX, newY, layer))) {
                     Node neighbor = new Node(newX, newY, layer);
 
                     double tentativeStartCost = current.startCost + distance(current, neighbor);
