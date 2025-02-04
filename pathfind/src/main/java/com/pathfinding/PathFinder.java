@@ -48,8 +48,32 @@ public class PathFinder {
      */
     public List<Node> pathfind(Location L1, Location L2) {
         int[] entranceStart = ((LinkedList<int[]>) map.getCoords(L1)).get(0);
-        List<int[]> endCoords = ((LinkedList<int[]>) map.getCoords(L2));
-        return pathfind(entranceStart, endCoords);
+        List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(L2));
+        return pathfind(entranceStart, entranceEnd);
+    }
+
+    /**
+     * Pathfind between two locations
+     * 
+     * @param L1 location 1
+     * @param L2 location 2
+     * @return list of nodes which is a path between two locations
+     */
+    public List<Node> pathfind(int[] pos1, Location L2) {
+        List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(L2));
+        return pathfind(pos1, entranceEnd);
+    }
+
+    /**
+     * Pathfind between two locations
+     * 
+     * @param L1 location 1
+     * @param L2 location 2
+     * @return list of nodes which is a path between two locations
+     */
+    public List<Node> pathfind(Location L1, int[] pos2) {
+        int[] entranceStart = ((LinkedList<int[]>) map.getCoords(L1)).get(0);
+        return pathfind(entranceStart, pos2);
     }
 
     /**
@@ -61,7 +85,7 @@ public class PathFinder {
      */
     public List<Node> pathfind(String S1, String S2) {
         int[] entranceStart = ((LinkedList<int[]>) map.getCoords(S1)).get(0);
-        Set<int[]> entranceEnd = new HashSet<>(map.getCoords(S2));
+        List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(S1));
         return pathfind(entranceStart, entranceEnd);
     }
 
