@@ -106,7 +106,7 @@ public class MapDisplayFrame {
 
     public static void main(String[] args) {
         MapDisplayFrame x = new MapDisplayFrame();
-        x.guiSetup("MapImages");
+        x.guiSetup("PathingNew\\MapImages");
     }
 
     private void createInfoPanel() {
