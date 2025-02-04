@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -39,46 +41,45 @@ public class MapDisplayFrame {
     private MapTile[][][] grid;
     private InfoPanel infoPanel;
     private JPanel viewerPanel;
+    private PathFinder p;
+    private List<MapDisplay> floors;
 
-    public void guiSetup(String folderPath) {
+    public MapDisplayFrame(String folderPath) throws IOException{
         MapReader reader = new MapReader();
         startCoords = new int[3];
         endCoords = new int[3];
-
-        try {
-            frame = new JFrame("Pathfinding Visualization");
-            frame.setSize(1250, 750);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            JMenuBar menuBar = new JMenuBar();
-            frame.setJMenuBar(menuBar);
-            JMenuItem mn = new JMenuItem("Choose Folder");
-            menuBar.add(mn);
-            mn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JFileChooser fileChooser = new JFileChooser(".");
-                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    switch (fileChooser.showOpenDialog(frame)) {
-                        case JFileChooser.APPROVE_OPTION:
-                            //Need Find Better Implementation
-                            // frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-                            // guiSetup(fileChooser.getSelectedFile().getAbsolutePath());
-                            break;
-                    }
+        frame = new JFrame("Pathfinding Visualization");
+        frame.setSize(1250, 750);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+        JMenuItem mn = new JMenuItem("Choose Folder");
+        menuBar.add(mn);
+        mn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser(".");
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                switch (fileChooser.showOpenDialog(frame)) {
+                    case JFileChooser.APPROVE_OPTION:
+                        //Need Find Better Implementation
+                        // frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                        // guiSetup(fileChooser.getSelectedFile().getAbsolutePath());
+                        break;
                 }
-            });
+            }
+        });
+        grid = reader.readImageMap(folderPath);
+        locMapping = reader.getLocMapping();
+        vmMapping = reader.getVMMapping();
+        colorMapping = reader.getColorMapping();
+        gMap = new GeneralMap(grid);
+        p = new PathFinder(gMap);
+        floors = new LinkedList<>();
+    }
 
-            grid = reader.readImageMap(folderPath);
-            locMapping = reader.getLocMapping();
-            vmMapping = reader.getVMMapping();
-            colorMapping = reader.getColorMapping();
-            gMap = new GeneralMap(grid);
-            PathFinder p = new PathFinder(gMap);
-
-            Location loc1 = locMapping.get("mdl");
-            Location loc2 = locMapping.get("foodcourt");
-            List<Node> pathFromAC = p.pathfind(loc1, loc2);
-
+    public void guiSetup() {
+        try {
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
             createInfoPanel();
@@ -91,7 +92,7 @@ public class MapDisplayFrame {
 
             panel.add(buttonPanel);
 
-            viewerPanel = createMapViewerPanel(pathFromAC, loc1, loc2);
+            viewerPanel = createMapViewerPanel();
             panel.add(viewerPanel);
 
             JScrollPane scroll = new JScrollPane(panel);
@@ -105,8 +106,12 @@ public class MapDisplayFrame {
     }
 
     public static void main(String[] args) {
-        MapDisplayFrame x = new MapDisplayFrame();
-        x.guiSetup("PathingNew\\MapImages");
+        try {
+            MapDisplayFrame x = new MapDisplayFrame("MapImages");
+            x.guiSetup();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
     }
 
     private void createInfoPanel() {
@@ -114,7 +119,7 @@ public class MapDisplayFrame {
         infoPanel = new InfoPanel(startCoords, endCoords);
     }
 
-    private JPanel createMapViewerPanel(List<Node> pathFromAC, Location loc1, Location loc2) {
+    private JPanel createMapViewerPanel() {
         JPanel mapViewer = new JPanel();
         mapViewer.setLayout(new FlowLayout());
         mapViewer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -124,14 +129,10 @@ public class MapDisplayFrame {
             tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
             JLabel floor = new JLabel("Floor " + (i + 1));
             tab.add(floor);
-            MapDisplay tempMapDisplay;
-            if (i == gMap.getCoords(loc1).get(0)[0] || i == gMap.getCoords(loc2).get(0)[0]) {
-                tempMapDisplay = new MapDisplay(grid[i], pathFromAC, i, 500, 500, colorMapping, i);
-            } else {
-                tempMapDisplay = new MapDisplay(grid[i], null, i, 500, 500, colorMapping, i);
-            }
+            MapDisplay tempMapDisplay = new MapDisplay(grid[i], null, 500, 500, colorMapping, i);
             tempMapDisplay.setName("Floor " + (i + 1));
             tempMapDisplay.addMouseListener(listener);
+            floors.add(tempMapDisplay);
             tab.add(tempMapDisplay);
             mapViewer.add(tab);
         }
@@ -176,6 +177,57 @@ public class MapDisplayFrame {
         public void actionPerformed(ActionEvent e) {
             //Currently incomplete
             System.out.println("Routing");
+            int zValueS = startCoords[0];
+            int yValueS = startCoords[1];
+            int xValueS = startCoords[2];
+
+            int zValueE = endCoords[0];
+            int yValueE = endCoords[1];
+            int xValueE = endCoords[2];
+
+            boolean isStartLoc = false;
+            boolean isEndLoc = false;
+
+            MapTile startTile = gMap.getTile(zValueS, yValueS, xValueS);
+            MapTile endTile = gMap.getTile(zValueE, yValueE, xValueE);
+
+            switch (startTile.getTileType()){
+                case "location":
+                case "entrance":
+                    isStartLoc = true;
+                    break;
+                default:
+                    break;
+            }
+
+            switch (endTile.getTileType()){
+                case "location":
+                case "entrance":
+                    isEndLoc = true;
+                    break;
+                default:
+                    break;
+            }
+            Object x = new int[3];
+            
+            List<Node> pathFromAC;
+            if (isStartLoc && isEndLoc){
+                pathFromAC = p.pathfind(startTile.getLocation(), endTile.getLocation());
+            }
+            else if (isStartLoc && !isEndLoc){
+                pathFromAC = p.pathfind(startTile.getLocation(), endCoords);
+            }
+            else if (!isStartLoc && isEndLoc){
+                pathFromAC = p.pathfind(startCoords, endTile.getLocation());
+            }
+            else {
+                pathFromAC = p.pathfind(startCoords, endCoords);
+            }
+
+            for (MapDisplay floor : floors){
+                floor.setPath(pathFromAC);
+                floor.repaint();
+            }
         }
     }
 

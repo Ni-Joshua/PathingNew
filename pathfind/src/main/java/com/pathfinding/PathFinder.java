@@ -85,7 +85,7 @@ public class PathFinder {
      */
     public List<Node> pathfind(String S1, String S2) {
         int[] entranceStart = ((LinkedList<int[]>) map.getCoords(S1)).get(0);
-        List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(S1));
+        List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(S2));
         return pathfind(entranceStart, entranceEnd);
     }
 

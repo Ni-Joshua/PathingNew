@@ -26,14 +26,12 @@ public class MapDisplay extends JPanel{
     private List<Node> path;
     private int xSize;
     private int ySize;
-    private int layer;
     private TreeMap<String, String> colorMapping;
     private int cellSize;
     
-    public MapDisplay(MapTile[][] grid, List<Node> path, int layer, int xSize, int ySize, TreeMap<String, String> colorMapping, int zValue){
+    public MapDisplay(MapTile[][] grid, List<Node> path,int xSize, int ySize, TreeMap<String, String> colorMapping, int zValue){
         this.grid = grid;
         this.path = path;
-        this.layer = layer;
         this.xSize = xSize;
         this.ySize = ySize;
         this.colorMapping = colorMapping;
@@ -82,7 +80,7 @@ public class MapDisplay extends JPanel{
             g2d.setColor(new Color(0, 0, 255));
             g2d.setStroke(new BasicStroke(cellSize/2));
             for (int i = 0; i< path.size()-1; i++) {
-                if (path.get(i).z == layer && path.get(i+1).z == layer){
+                if (path.get(i).z == zValue && path.get(i+1).z == zValue){
                     gradient = new GradientPaint(path.get(i).x, path.get(i).y, new Color(0, i*colorStep, 255), path.get(i+1).x, path.get(i+1).y, new Color(0, (i+1)*colorStep, 255));
                     g2d.setPaint(gradient);
                     g2d.drawLine(path.get(i).x*cellSize + cellSize/2, path.get(i).y*cellSize + cellSize/2, path.get(i+1).x*cellSize + cellSize/2, path.get(i+1).y*cellSize + cellSize/2);
@@ -98,6 +96,10 @@ public class MapDisplay extends JPanel{
 
     public int getScale(){
         return cellSize;
+    }
+
+    public void setPath(List<Node> path){
+        this.path = path;
     }
 
 }
