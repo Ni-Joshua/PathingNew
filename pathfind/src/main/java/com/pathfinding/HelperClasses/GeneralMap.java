@@ -86,7 +86,7 @@ public class GeneralMap {
      * @param z z coordinate
      * @return tile at the coordinate
      */
-    public MapTile getTile(int x, int y, int z) {
+    public MapTile getTile(int z, int y, int x) {
         return map[z][y][x];
     }
 

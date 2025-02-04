@@ -6,41 +6,48 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import com.pathfinding.HelperClasses.MapMats.MapTile;
 
 public class MapDisplay extends JPanel{
         // private static int[][][] grid;
     private MapTile[][] grid;
+    private int zValue;
     private List<Node> path;
     private int xSize;
     private int ySize;
     private int layer;
     private TreeMap<String, String> colorMapping;
-
+    private int cellSize;
     
-    public MapDisplay(MapTile[][] grid, List<Node> path, int layer, int xSize, int ySize, TreeMap<String, String> colorMapping){
+    public MapDisplay(MapTile[][] grid, List<Node> path, int layer, int xSize, int ySize, TreeMap<String, String> colorMapping, int zValue){
         this.grid = grid;
         this.path = path;
         this.layer = layer;
         this.xSize = xSize;
         this.ySize = ySize;
         this.colorMapping = colorMapping;
+        this.zValue = zValue;
         super.setPreferredSize(new Dimension(xSize, ySize));
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D g2d = (Graphics2D) g;
 
         // int cellSize = 50;
-        int cellSize = Math.min(xSize/grid[0].length, ySize/grid.length);
+        cellSize = Math.min(xSize/grid[0].length, ySize/grid.length);
         for (int y = 0; y < grid.length; y++) {
             for (int x = 0; x < grid[y].length; x++) {
                 MapTile tile = grid[y][x];
@@ -61,20 +68,9 @@ public class MapDisplay extends JPanel{
                 int blue = Integer.parseInt(hex.substring(4, 6), 16);
 
                 Color color = new Color(red, green, blue);
-
-                // if (grid[y][x].getTileType().equals("wall")) {
-                //     g2d.setColor(Color.BLACK);
-                // } else if (grid[y][x].getTileType().equals("verticalmover")){
-                //     g2d.setColor(Color.pink);
-                // } else if (grid[y][x].getTileType().equals("location")){
-                //     g2d.setColor(Color.red);
-                // } else if (grid[y][x].getTileType().equals("entrance")){
-                //     g2d.setColor(Color.green);
-                // }else {
-                //     g2d.setColor(Color.WHITE);
-                // }
                 g2d.setColor(color);
                 g2d.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+
                 // g2d.setColor(Color.GRAY);
                 // g2d.drawRect(x* cellSize, y * cellSize, cellSize, cellSize);
             }
@@ -95,4 +91,13 @@ public class MapDisplay extends JPanel{
             }
         }
     }
+
+    public int getZValue(){
+        return zValue;
+    }
+
+    public int getScale(){
+        return cellSize;
+    }
+
 }
