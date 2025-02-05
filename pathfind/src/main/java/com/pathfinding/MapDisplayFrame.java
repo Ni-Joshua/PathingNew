@@ -2,12 +2,14 @@ package com.pathfinding;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
@@ -22,6 +24,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
@@ -43,11 +46,11 @@ public class MapDisplayFrame {
     private JPanel viewerPanel;
     private PathFinder p;
     private List<MapDisplay> floors;
+    private String folderPath;
+    private JScrollPane scroll;
+
 
     public MapDisplayFrame(String folderPath) throws IOException{
-        MapReader reader = new MapReader();
-        startCoords = new int[3];
-        endCoords = new int[3];
         frame = new JFrame("Pathfinding Visualization");
         frame.setSize(1250, 750);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,23 +66,37 @@ public class MapDisplayFrame {
                 switch (fileChooser.showOpenDialog(frame)) {
                     case JFileChooser.APPROVE_OPTION:
                         //Need Find Better Implementation
-                        // frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-                        // guiSetup(fileChooser.getSelectedFile().getAbsolutePath());
+                        setFolderPath(fileChooser.getSelectedFile().getAbsolutePath());
+                        for (MapDisplay floor : floors){
+                            floor.removeMouseListener(floor.getMouseListeners()[0]);
+                        }
+                        frame.remove(scroll);
+                        guiSetup();
                         break;
                 }
             }
         });
-        grid = reader.readImageMap(folderPath);
-        locMapping = reader.getLocMapping();
-        vmMapping = reader.getVMMapping();
-        colorMapping = reader.getColorMapping();
-        gMap = new GeneralMap(grid);
-        p = new PathFinder(gMap);
-        floors = new LinkedList<>();
+        this.folderPath = folderPath;
+    }
+
+    public void setFolderPath(String folderPath){
+        this.folderPath = folderPath;
     }
 
     public void guiSetup() {
         try {
+            
+            startCoords = new int[3];
+            endCoords = new int[3];
+            MapReader reader = new MapReader();
+            grid = reader.readImageMap(folderPath);
+            locMapping = reader.getLocMapping();
+            vmMapping = reader.getVMMapping();
+            colorMapping = reader.getColorMapping();
+            gMap = new GeneralMap(grid);
+            p = new PathFinder(gMap);
+            floors = new LinkedList<>();
+
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
             createInfoPanel();
@@ -92,10 +109,10 @@ public class MapDisplayFrame {
 
             panel.add(buttonPanel);
 
-            viewerPanel = createMapViewerPanel();
+            createviewerPanelPanel();
             panel.add(viewerPanel);
 
-            JScrollPane scroll = new JScrollPane(panel);
+            scroll = new JScrollPane(panel);
             frame.add(scroll);
             frame.setVisible(true);
 
@@ -119,12 +136,13 @@ public class MapDisplayFrame {
         infoPanel = new InfoPanel(startCoords, endCoords);
     }
 
-    private JPanel createMapViewerPanel() {
-        JPanel mapViewer = new JPanel();
-        mapViewer.setLayout(new FlowLayout());
-        mapViewer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    private void createviewerPanelPanel() {
+        viewerPanel = new JPanel();
+        viewerPanel.setLayout(new FlowLayout());
+        viewerPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         Listener listener = new Listener();
         for (int i = 0; i < grid.length; i++) {
+            System.out.println(i);
             JPanel tab = new JPanel();
             tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
             JLabel floor = new JLabel("Floor " + (i + 1));
@@ -134,9 +152,8 @@ public class MapDisplayFrame {
             tempMapDisplay.addMouseListener(listener);
             floors.add(tempMapDisplay);
             tab.add(tempMapDisplay);
-            mapViewer.add(tab);
+            viewerPanel.add(tab);
         }
-        return mapViewer;
     }
 
     private class Listener extends MouseAdapter {
@@ -149,9 +166,9 @@ public class MapDisplayFrame {
             int yValue = e.getY() / cellSize;
             int xValue = e.getX() / cellSize;
 
-            // System.out.println(e.getPoint());
-            // System.out.println(zValue + " " + xValue + " " + yValue);
-            // System.out.println(gMap.getTile(zValue, yValue, xValue).getTileType());
+            System.out.println(e.getPoint());
+            System.out.println(zValue + " " + xValue + " " + yValue);
+            System.out.println(gMap.getTile(zValue, yValue, xValue).getTileType());
 
             if (SwingUtilities.isLeftMouseButton(e)) {
                 if (gMap.getTile(zValue, yValue, xValue).isSelectable()) {
@@ -175,7 +192,10 @@ public class MapDisplayFrame {
     private class Routing implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            //Currently incomplete
+
+            for (MapDisplay x: floors){
+                System.out.println(Arrays.toString(x.getMouseListeners()));
+            }
             System.out.println("Routing");
             int zValueS = startCoords[0];
             int yValueS = startCoords[1];

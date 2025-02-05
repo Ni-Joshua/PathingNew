@@ -56,9 +56,9 @@ public class MapReader {
         JsonNode colorMap = info.get("ColorMapping");
 
         for (int z = 0; z < depth; z++) {
+            BufferedImage currentFloor = ImageIO.read(floorPlans[z]);
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    BufferedImage currentFloor = ImageIO.read(floorPlans[z]);
                     int rgb = currentFloor.getRGB(x, y);
                     String hex = Integer.toHexString(rgb & 0xffffff);
                     while (hex.length() < 6) {
