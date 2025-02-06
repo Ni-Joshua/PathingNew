@@ -150,7 +150,7 @@ public class MapDisplayFrame {
             tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
             JLabel floor = new JLabel("Floor " + (i + 1));
             tab.add(floor);
-            MapDisplay tempMapDisplay = new MapDisplay(grid[i], null, 500, 500, colorMapping, i);
+            MapDisplay tempMapDisplay = new MapDisplay(grid[i], null, Math.max(500, grid[i].length), Math.max(500, grid[i][0].length), colorMapping, i);
             tempMapDisplay.setName("Floor " + (i + 1));
             tempMapDisplay.addMouseListener(listener);
             floors.add(tempMapDisplay);
