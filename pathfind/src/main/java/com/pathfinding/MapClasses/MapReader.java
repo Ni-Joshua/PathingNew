@@ -3,13 +3,9 @@ package com.pathfinding.MapClasses;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.AccessFlag;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
@@ -27,11 +23,24 @@ import com.pathfinding.MapClasses.MapMats.Time;
 import com.pathfinding.MapClasses.MapMats.VerticalMoverTile;
 import com.pathfinding.MapClasses.MapMats.WallTile;
 
+/**
+ * Class that handles constructing maps from a given folder
+ * @author Joshua Ni
+ * @author Justin Ely
+ */
 public class MapReader {
+    //Maps that store key information from the Json File
     private TreeMap<String, Location> locMapping;
     private TreeMap<String, VerticalMoverTile> vmMapping;
     private TreeMap<String, String> colorMapping;
 
+    /**
+     * Constructs 3D array of MapTiles from a given folder
+     * @param folderPath
+     * @return 3D array of MapTiles representing the multi-level building
+     * @throws JsonProcessingException
+     * @throws IOException
+     */
     public MapTile[][][] readImageMap(String folderPath) throws JsonProcessingException, IOException {
         File mall = new File(folderPath + "\\Floors");
         File[] floorPlans = mall.listFiles();
@@ -53,6 +62,7 @@ public class MapReader {
 
         JsonNode colorMap = info.get("ColorMapping");
 
+        //Mapping each pixel's color to an object
         for (int z = 0; z < depth; z++) {
             BufferedImage currentFloor = ImageIO.read(floorPlans[z]);
             for (int y = 0; y < height; y++) {
@@ -75,6 +85,8 @@ public class MapReader {
                     } else {
                         gMap[z][y][x] = new LocationTile(locMapping.get(tileType));
                     }
+                    
+                    //Storing String ID to Hexadecimal color code information in colorMapping, entrances will be colored the same as location tiles
                     if (!tileType.contains(" ") && !colorMapping.containsKey(tileType)){
                         String key = "";
                         if (tileType.equals("wall")){
@@ -88,28 +100,44 @@ public class MapReader {
                         }
                         colorMapping.put(key, hex);
                     }
+                    /*Check for entrances that do not have location tiles associated with them (usually entrance of building) */
                     if (tileType.contains(" ") && tileType.substring(0, tileType.indexOf(" ")).equals("ent") && !colorMapping.containsKey(tileType.substring(tileType.indexOf(" ") + 1))){
                         colorMapping.put(tileType.substring(tileType.indexOf(" ") + 1), hex);
                     }
-                    // System.out.println(z + " " + y + " " + x + ": " + tileType);
                 }
             }
         }
         return gMap;
     }
 
+    /**
+     * Returns map between VerticalMover String IDs and their object form
+     * @return vmMapping
+     */
     public TreeMap<String, VerticalMoverTile> getVMMapping() {
         return vmMapping;
     }
 
+    /**
+     * Returns map between Location String IDs and their object form
+     * @return locMapping
+     */
     public TreeMap<String, Location> getLocMapping() {
         return locMapping;
     }
 
+    /**
+     * Returns map between String IDs to Hexadecimal color
+     * @return
+     */
     public TreeMap<String, String> getColorMapping() {
         return colorMapping;
     }
 
+    /**
+     * Creates locMapping array based on information read from the json file
+     * @param locations JsonNode of Location information
+     */
     private void locCreation(JsonNode locations) {
         locMapping = new TreeMap<>();
         for (Iterator<String> it = locations.fieldNames(); it.hasNext();) {
@@ -121,16 +149,22 @@ public class MapReader {
         }
     }
 
+    /**
+     * Creates vmMapping based on information read from the json file
+     * @param vMovers JsonNode of VerticalMoverTile information
+     * @throws IOException
+     */
     private void vmCreation(JsonNode vMovers) throws IOException {
         vmMapping = new TreeMap<>();
         ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.readerFor(new TypeReference<List<String>>() {
-        });
+        ObjectReader reader = mapper.readerFor(new TypeReference<List<String>>() {});
+        //creates new VerticalMoverTiles to make the objects exist
         for (Iterator<String> it = vMovers.fieldNames(); it.hasNext();) {
             String vmID = it.next();
             vmMapping.put(vmID, new VerticalMoverTile(null));
         }
 
+        //Fills the existing objects with connectedTiles information
         for (Iterator<String> it = vMovers.fieldNames(); it.hasNext();) {
             String vmID = it.next();
             JsonNode vm = vMovers.get(vmID);

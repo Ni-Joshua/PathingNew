@@ -54,6 +54,7 @@ public class Location {
         return closeTime;
     }
 
+   
     @Override
     public String toString(){
         return name + ", Opens: " + openTime + ", Closes: " + closeTime;

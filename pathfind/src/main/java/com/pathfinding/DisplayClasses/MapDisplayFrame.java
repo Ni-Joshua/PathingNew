@@ -181,8 +181,11 @@ public class MapDisplayFrame {
                     startCoords[2] = xValue;
                     infoPanel.setStartInfo(startCoords, gMap.getTile(zValue, yValue, xValue));
                     startPressed = true;
-                    floors.get(0).setStartCoords(startCoords);
-                    floors.get(0).repaint();
+                    for (MapDisplay floor: floors){
+                        floor.setStartCoords(startCoords);
+                        floor.repaint();
+                    }
+                    
                 }
             } else if (SwingUtilities.isRightMouseButton(e)) {
                 if (gMap.getTile(zValue, yValue, xValue).isSelectable()) {
@@ -191,8 +194,10 @@ public class MapDisplayFrame {
                     endCoords[2] = xValue;
                     infoPanel.setEndInfo(endCoords, gMap.getTile(zValue, yValue, xValue));
                     endPressed = true;
-                    floors.get(0).setEndCoords(endCoords);
-                    floors.get(0).repaint();
+                    for (MapDisplay floor: floors){
+                        floor.setEndCoords(endCoords);
+                        floor.repaint();
+                    }
                 }
             }
             if (startPressed && endPressed){
