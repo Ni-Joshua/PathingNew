@@ -30,6 +30,8 @@ public class MapDisplay extends JPanel{
     //TreeMap from tileType/name to hexadecimal color value
     private TreeMap<String, String> colorMapping;
     private int cellSize;
+    private int[] startCoords;
+    private int[] endCoords;
     
     /**
      * Constructs a display depending on given values
@@ -96,11 +98,29 @@ public class MapDisplay extends JPanel{
             g2d.setStroke(new BasicStroke(cellSize/2));
             for (int i = 0; i< path.size()-1; i++) {
                 if (path.get(i).getZ() == zValue && path.get(i+1).getZ() == zValue){
+                    // if (i == 0){
+                    //     g2d.setPaint(new Color(0, 255, 0));
+                    //     g2d.drawOval(path.get(i).getX()*cellSize + cellSize/2, path.get(i).getY()*cellSize + cellSize/2, cellSize, cellSize);
+                    // }
+                    // if (i == path.size()-1){
+                    //     g2d.setPaint(new Color(255, 0, 0));
+                    //     g2d.drawOval(path.get(i).getX()*cellSize + cellSize/2, path.get(i).getY()*cellSize + cellSize/2, cellSize, cellSize);
+                    // }
                     gradient = new GradientPaint(path.get(i).getX(), path.get(i).getY(), new Color(0, i*colorStep, 255), path.get(i+1).getX(), path.get(i+1).getY(), new Color(0, (i+1)*colorStep, 255));
                     g2d.setPaint(gradient);
                     g2d.drawLine(path.get(i).getX()*cellSize + cellSize/2, path.get(i).getY()*cellSize + cellSize/2, path.get(i+1).getX()*cellSize + cellSize/2, path.get(i+1).getY()*cellSize + cellSize/2);
                 }   
             }
+        }
+
+        if (startCoords != null){
+            g2d.setPaint(new Color(0, 255, 0));
+            g2d.drawOval(startCoords[0], startCoords[1], cellSize, cellSize);
+        }
+
+        if (endCoords != null){
+            g2d.setPaint(new Color(0, 0, 255));
+            g2d.drawOval(endCoords[0], endCoords[1], cellSize, cellSize);
         }
     }
 
@@ -126,6 +146,14 @@ public class MapDisplay extends JPanel{
      */
     public void setPath(List<Node> path){
         this.path = path;
+    }
+
+    public void setStartCoords(int[] startCoords){
+        this.startCoords = startCoords;
+    }
+
+    public void setEndCoords(int[] endCoords){
+        this.endCoords = endCoords;
     }
 
 }
