@@ -67,12 +67,10 @@ public class MapDisplayFrame {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 switch (fileChooser.showOpenDialog(frame)) {
                     case JFileChooser.APPROVE_OPTION:
-                        //Need Find Better Implementation
                         setFolderPath(fileChooser.getSelectedFile().getAbsolutePath());
-                        for (MapDisplay floor : floors){
-                            floor.removeMouseListener(floor.getMouseListeners()[0]);
+                        if (scroll != null){
+                            frame.remove(scroll);
                         }
-                        frame.remove(scroll);
                         guiSetup();
                         break;
                 }
@@ -86,40 +84,44 @@ public class MapDisplayFrame {
     }
 
     public void guiSetup() {
-        try {
-            
-            startCoords = new int[3];
-            endCoords = new int[3];
-            MapReader reader = new MapReader();
-            grid = reader.readImageMap(folderPath);
-            locMapping = reader.getLocMapping();
-            vmMapping = reader.getVMMapping();
-            colorMapping = reader.getColorMapping();
-            gMap = new GeneralMap(grid);
-            p = new PathFinder(gMap);
-            floors = new LinkedList<>();
-
-            JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-            createInfoPanel();
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new GridLayout());
-            buttonPanel.add(infoPanel);
-            JButton b = new JButton("Route");
-            b.addActionListener(new Routing());
-            buttonPanel.add(b);
-
-            panel.add(buttonPanel);
-
-            createviewerPanelPanel();
-            panel.add(viewerPanel);
-
-            scroll = new JScrollPane(panel);
-            frame.add(scroll);
+        if (folderPath != null){
+            try {
+                startCoords = new int[3];
+                endCoords = new int[3];
+                MapReader reader = new MapReader();
+                grid = reader.readImageMap(folderPath);
+                locMapping = reader.getLocMapping();
+                vmMapping = reader.getVMMapping();
+                colorMapping = reader.getColorMapping();
+                gMap = new GeneralMap(grid);
+                p = new PathFinder(gMap);
+                floors = new LinkedList<>();
+    
+                JPanel panel = new JPanel();
+                panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+                createInfoPanel();
+                JPanel buttonPanel = new JPanel();
+                buttonPanel.setLayout(new GridLayout());
+                buttonPanel.add(infoPanel);
+                JButton b = new JButton("Route");
+                b.addActionListener(new Routing());
+                buttonPanel.add(b);
+    
+                panel.add(buttonPanel);
+    
+                createviewerPanelPanel();
+                panel.add(viewerPanel);
+    
+                scroll = new JScrollPane(panel);
+                frame.add(scroll);
+                frame.setVisible(true);
+    
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+        else {
             frame.setVisible(true);
-
-        } catch (Exception e) {
-            System.out.println(e);
         }
 
     }
@@ -185,11 +187,6 @@ public class MapDisplayFrame {
     private class Routing implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            for (MapDisplay x: floors){
-                System.out.println(Arrays.toString(x.getMouseListeners()));
-            }
-            System.out.println("Routing");
             int zValueS = startCoords[0];
             int yValueS = startCoords[1];
             int xValueS = startCoords[2];
