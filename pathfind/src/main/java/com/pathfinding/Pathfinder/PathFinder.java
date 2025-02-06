@@ -46,7 +46,7 @@ public class PathFinder {
      * @return list of nodes which is a path between two locations
      */
     public List<Node> pathfind(Location L1, Location L2) {
-        int[] entranceStart = ((LinkedList<int[]>) map.getCoords(L1)).get(0);
+        List<int[]> entranceStart = ((LinkedList<int[]>) map.getCoords(L1));
         List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(L2));
         return pathfind(entranceStart, entranceEnd);
     }
@@ -59,8 +59,10 @@ public class PathFinder {
      * @return list of nodes which is a path between two locations
      */
     public List<Node> pathfind(int[] pos1, Location L2) {
+        List<int[]> startList = new LinkedList<>();
+        startList.add(pos1);
         List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(L2));
-        return pathfind(pos1, entranceEnd);
+        return pathfind(startList, entranceEnd);
     }
 
     /**
@@ -83,7 +85,7 @@ public class PathFinder {
      * @return list of nodes which is a path between two locations
      */
     public List<Node> pathfind(String S1, String S2) {
-        int[] entranceStart = ((LinkedList<int[]>) map.getCoords(S1)).get(0);
+        List<int[]> entranceStart = ((LinkedList<int[]>) map.getCoords(S1));
         List<int[]> entranceEnd = ((LinkedList<int[]>) map.getCoords(S2));
         return pathfind(entranceStart, entranceEnd);
     }
@@ -97,9 +99,11 @@ public class PathFinder {
      * @return list of nodes representing the path
      */
     public List<Node> pathfind(int[] start, int[] end) {
-        List<int[]> endNode = new LinkedList<>();
-        endNode.add(end);
-        return pathfind(start, endNode);
+        List<int[]> endList = new LinkedList<>();
+        List<int[]> startList = new LinkedList<>();
+        endList.add(end);
+        startList.add(end);
+        return pathfind(startList, endList);
     }
 
     /**
@@ -111,16 +115,20 @@ public class PathFinder {
      * @param endings  ending position
      * @return list of nodes representing the path
      */
-    private List<Node> pathfind(int[] starting, List<int[]> endings) {
+    private List<Node> pathfind(List<int[]> startings, List<int[]> endings) {
         List<Node> totalPath = new ArrayList<>();
         List<Node> endNodes = new ArrayList<>();
+        List<Node> startNodes = new ArrayList<>();
 
-        if (starting[0] != endings.get(0)[0]) {
-            VerticalMoverTile mover = findNearestViableVerticalMover(starting, endings.get(0)[0]);
-            int[] end1Pos = findAppropriateVerticalMoverPosition(mover, starting);
+        for (int[] arr : startings) {
+            startNodes.add(new Node(arr[2], arr[1], arr[0]));
+        }
+
+        if (startings.get(0)[0] != endings.get(0)[0]) {
+            VerticalMoverTile mover = findNearestViableVerticalMover(startings.get(0), endings.get(0)[0]);
+            int[] end1Pos = findAppropriateVerticalMoverPosition(mover, startings.get(0));
             endNodes.add(new Node(end1Pos[2], end1Pos[1], end1Pos[0]));
-            totalPath.addAll(findPathByLayer(new Node(starting[2], starting[1], starting[0]),
-                    endNodes, starting[0]));
+            totalPath.addAll(findPathByLayer(startNodes, endNodes, startings.get(0)[0]));
 
             endNodes.clear();
             for (int[] arr : endings) {
@@ -128,14 +136,15 @@ public class PathFinder {
             }
 
             int[] start2Pos = findAppropriateVerticalMoverPosition(mover, endings.get(0));
-            totalPath.addAll(findPathByLayer(new Node(start2Pos[2], start2Pos[1], endings.get(0)[0]),
-                    endNodes, endings.get(0)[0]));
+            List<Node> start2List = new ArrayList<>();
+            start2List.add(new Node(start2Pos[2], start2Pos[1], endings.get(0)[0]));
+            totalPath.addAll(findPathByLayer(start2List, endNodes, endings.get(0)[0]));
         } else {
             for (int[] arr : endings) {
                 endNodes.add(new Node(arr[2], arr[1], arr[0]));
             }
             totalPath.addAll(
-                    findPathByLayer(new Node(starting[2], starting[1], starting[0]), endNodes, starting[0]));
+                    findPathByLayer(startNodes, endNodes, startings.get(0)[0]));
         }
 
         return totalPath;
@@ -222,10 +231,18 @@ public class PathFinder {
      * @param layer the 2D layer of the map that we are pathfinding on
      * @return list of nodes that represents the path between the two points
      */
-    private List<Node> findPathByLayer(Node start, List<Node> endings, int layer) {
+    private List<Node> findPathByLayer(List<Node> starts, List<Node> endings, int layer) {
         // Priority queue ranks items by heuristic cost
         PriorityQueue<Node> unexplored = new PriorityQueue<>(Comparator.comparingDouble(Node::getTotalCost));
         Set<Node> explored = new HashSet<>();
+
+        Node start = new Node(0, 0, 0);
+        double startingHeuristic = Double.MAX_VALUE;
+        for (Node n : starts){
+            if (heuristic(n, endings)<startingHeuristic){
+                start = n;
+            }
+        }
 
         start.setStartCost(0);
         start.setEndCost(heuristic(start, endings));

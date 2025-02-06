@@ -126,7 +126,7 @@ public class MapDisplay extends JPanel{
         }
 
         if (endCoords != null){
-            g2d.setPaint(new Color(0, 0, 255));
+            g2d.setPaint(new Color(255, 0, 0));
             if (endCoords[0] == zValue){
                 g2d.drawOval(endCoords[2]*cellSize, endCoords[1]*cellSize, cellSize, cellSize);
             }
