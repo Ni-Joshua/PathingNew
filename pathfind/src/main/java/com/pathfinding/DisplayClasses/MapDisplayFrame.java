@@ -2,6 +2,7 @@ package com.pathfinding.DisplayClasses;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicRootPaneUI;
 
 import com.pathfinding.MapClasses.GeneralMap;
 import com.pathfinding.MapClasses.MapReader;
@@ -51,6 +53,9 @@ public class MapDisplayFrame {
     private List<MapDisplay> floors;
     private String folderPath;
     private JScrollPane scroll;
+    private boolean startPressed;
+    private boolean endPressed;
+    private JButton routeButton;
 
     public MapDisplayFrame(String folderPath) throws IOException{
         frame = new JFrame("Pathfinding Visualization");
@@ -88,6 +93,8 @@ public class MapDisplayFrame {
             try {
                 startCoords = new int[3];
                 endCoords = new int[3];
+                startPressed = false;
+                endPressed = false;
                 MapReader reader = new MapReader();
                 grid = reader.readImageMap(folderPath);
                 locMapping = reader.getLocMapping();
@@ -103,9 +110,10 @@ public class MapDisplayFrame {
                 JPanel buttonPanel = new JPanel();
                 buttonPanel.setLayout(new GridLayout());
                 buttonPanel.add(infoPanel);
-                JButton b = new JButton("Route");
-                b.addActionListener(new Routing());
-                buttonPanel.add(b);
+                routeButton = new JButton("Route");
+                routeButton.addActionListener(new Routing());
+                routeButton.setEnabled(false);
+                buttonPanel.add(routeButton);
     
                 panel.add(buttonPanel);
     
@@ -171,6 +179,7 @@ public class MapDisplayFrame {
                     startCoords[1] = yValue;
                     startCoords[2] = xValue;
                     infoPanel.setStartInfo(startCoords, gMap.getTile(zValue, yValue, xValue));
+                    startPressed = true;
                 }
             } else if (SwingUtilities.isRightMouseButton(e)) {
                 if (gMap.getTile(zValue, yValue, xValue).isSelectable()) {
@@ -178,9 +187,12 @@ public class MapDisplayFrame {
                     endCoords[1] = yValue;
                     endCoords[2] = xValue;
                     infoPanel.setEndInfo(endCoords, gMap.getTile(zValue, yValue, xValue));
+                    endPressed = true;
                 }
             }
-
+            if (startPressed && endPressed){
+                routeButton.setEnabled(true);
+            }
         }
     }
 
