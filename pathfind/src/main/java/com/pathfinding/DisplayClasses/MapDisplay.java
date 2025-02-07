@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -97,21 +96,12 @@ public class MapDisplay extends JPanel{
             GradientPaint gradient;
             int colorStep = 255/path.size();
             g2d.setColor(new Color(0, 0, 255));
-            int pixWidth = (int) Math.round(cellSize/2.0);
+            int pixWidth = (int) Math.ceil(cellSize/2.0);
             g2d.setStroke(new BasicStroke(pixWidth));
             for (int i = 0; i< path.size()-1; i++) {
                 if (path.get(i).getZ() == zValue && path.get(i+1).getZ() == zValue){
-                    // if (i == 0){
-                    //     g2d.setPaint(new Color(0, 255, 0));
-                    //     g2d.drawOval(path.get(i).getX()*cellSize - cellSize/2, path.get(i).getY()*cellSize - cellSize/2, cellSize, cellSize);
-                    // }
-                    // if (i == path.size()-2){
-                    //     g2d.setPaint(new Color(255, 0, 0));
-                    //     g2d.drawOval(path.get(i+1).getX()*cellSize - cellSize/2, path.get(i+1).getY()*cellSize - cellSize/2, cellSize, cellSize);
-                    // }
                     gradient = new GradientPaint(path.get(i).getX(), path.get(i).getY(), new Color(0, i*colorStep, 255), path.get(i+1).getX(), path.get(i+1).getY(), new Color(0, (i+1)*colorStep, 255));
                     g2d.setPaint(gradient);
-                    // g2d.drawLine(path.get(i).getX()*cellSize, path.get(i).getY()*cellSize, path.get(i+1).getX()*cellSize, path.get(i+1).getY()*cellSize);
                     g2d.drawLine(path.get(i).getX()*cellSize + pixWidth, path.get(i).getY()*cellSize + pixWidth, path.get(i+1).getX()*cellSize + pixWidth, path.get(i+1).getY()*cellSize + pixWidth);
                 }   
             }

@@ -1,6 +1,5 @@
 package com.pathfinding.MapClasses;
 
-import java.awt.datatransfer.SystemFlavorMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

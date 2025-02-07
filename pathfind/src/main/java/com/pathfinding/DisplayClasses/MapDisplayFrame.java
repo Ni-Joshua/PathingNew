@@ -2,15 +2,11 @@ package com.pathfinding.DisplayClasses;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Panel;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
@@ -21,14 +17,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.plaf.basic.BasicRootPaneUI;
 
 import com.pathfinding.MapClasses.GeneralMap;
 import com.pathfinding.MapClasses.MapReader;
@@ -39,28 +32,34 @@ import com.pathfinding.Pathfinder.Node;
 import com.pathfinding.Pathfinder.PathFinder;
 
 public class MapDisplayFrame {
-    private JFrame frame;
+    private String folderPath;
     private int[] startCoords;
     private int[] endCoords;
     private TreeMap<String, Location> locMapping;
     private TreeMap<String, VerticalMoverTile> vmMapping;
     private TreeMap<String, String> colorMapping;
     private GeneralMap gMap;
-    private MapTile[][][] grid;
+    private PathFinder p;
+    private JFrame frame;
     private InfoPanel infoPanel;
     private JPanel viewerPanel;
-    private PathFinder p;
-    private List<MapDisplay> floors;
-    private String folderPath;
     private JScrollPane scroll;
+    private JButton routeButton;
+    private List<MapDisplay> floors;
     private boolean startPressed;
     private boolean endPressed;
-    private JButton routeButton;
 
+    /**
+     * Constructs a new JFrame that will handle all the UI
+     * @param folderPath folder path of map
+     * @throws IOException
+     */
     public MapDisplayFrame(String folderPath) throws IOException{
         frame = new JFrame("Multi-Level Mapper");
         frame.setSize(1250, 750);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //Constructs the file opener
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
         JMenuItem mn = new JMenuItem("Choose Folder");
@@ -84,10 +83,17 @@ public class MapDisplayFrame {
         this.folderPath = folderPath;
     }
 
+    /**
+     * Changes the displayed Map based on a new folderPath
+     * @param folderPath path to the new folder
+     */
     public void setFolderPath(String folderPath){
         this.folderPath = folderPath;
     }
 
+    /**
+     * Sets up all the UI and reads the map from the specified folder
+     */
     public void guiSetup() {
         if (folderPath != null){
             try {
@@ -96,11 +102,10 @@ public class MapDisplayFrame {
                 startPressed = false;
                 endPressed = false;
                 MapReader reader = new MapReader();
-                grid = reader.readImageMap(folderPath);
                 locMapping = reader.getLocMapping();
                 vmMapping = reader.getVMMapping();
                 colorMapping = reader.getColorMapping();
-                gMap = new GeneralMap(grid);
+                gMap = new GeneralMap(reader.readImageMap(folderPath));
                 p = new PathFinder(gMap);
                 floors = new LinkedList<>();
     
@@ -134,18 +139,23 @@ public class MapDisplayFrame {
 
     }
 
+    /**
+     * Creates the panel displaying start and end coordinate information
+     */
     private void createInfoPanel() {
-        // create a color info panel
         infoPanel = new InfoPanel(startCoords, endCoords);
     }
 
+    /**
+     * Creates the JPanel that displays all the floor maps
+     */
     private void createviewerPanelPanel() {
         viewerPanel = new JPanel();
         viewerPanel.setLayout(new FlowLayout());
         viewerPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         Listener listener = new Listener();
+        MapTile[][][] grid = gMap.getMap();
         for (int i = 0; i < grid.length; i++) {
-            System.out.println(i);
             JPanel tab = new JPanel();
             tab.setLayout(new BoxLayout(tab, BoxLayout.PAGE_AXIS));
             JLabel floor = new JLabel("Floor " + (i + 1));
@@ -160,8 +170,15 @@ public class MapDisplayFrame {
         }
     }
 
+    /**
+     * Class that handles mouse presses on the floor maps
+     */
     private class Listener extends MouseAdapter {
+        
         @Override
+        /**
+         * Handles mouse clicking on floor maps
+         */
         public void mouseClicked(MouseEvent e) {
             MapDisplay source = (MapDisplay) e.getSource();
             int cellSize = source.getScale();
@@ -175,6 +192,7 @@ public class MapDisplayFrame {
             System.out.println(gMap.getTile(zValue, yValue, xValue).getTileType());
 
             if (SwingUtilities.isLeftMouseButton(e)) {
+                //sets start location
                 if (gMap.getTile(zValue, yValue, xValue).isSelectable()) {
                     startCoords[0] = zValue;
                     startCoords[1] = yValue;
@@ -188,6 +206,7 @@ public class MapDisplayFrame {
                     
                 }
             } else if (SwingUtilities.isRightMouseButton(e)) {
+                //sets end location
                 if (gMap.getTile(zValue, yValue, xValue).isSelectable()) {
                     endCoords[0] = zValue;
                     endCoords[1] = yValue;
@@ -200,14 +219,21 @@ public class MapDisplayFrame {
                     }
                 }
             }
+            //For enabling the button after an initial start and end location are specified
             if (startPressed && endPressed){
                 routeButton.setEnabled(true);
             }
         }
     }
 
+    /**
+     * Class for handling the routing button
+     */
     private class Routing implements ActionListener {
         @Override
+        /**
+         * Handles the route button press 
+         */
         public void actionPerformed(ActionEvent e) {
             int zValueS = startCoords[0];
             int yValueS = startCoords[1];
@@ -240,8 +266,8 @@ public class MapDisplayFrame {
                 default:
                     break;
             }
-            Object x = new int[3];
             
+            //Routes depending on if the start and end locations are tied to an entrance
             List<Node> pathFromAC;
             if (isStartLoc && isEndLoc){
                 pathFromAC = p.pathfind(startTile.getLocation(), endTile.getLocation());
