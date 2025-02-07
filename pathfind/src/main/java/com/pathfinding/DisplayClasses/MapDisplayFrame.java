@@ -58,7 +58,7 @@ public class MapDisplayFrame {
     private JButton routeButton;
 
     public MapDisplayFrame(String folderPath) throws IOException{
-        frame = new JFrame("Pathfinding Visualization");
+        frame = new JFrame("Multi-Level Mapper");
         frame.setSize(1250, 750);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JMenuBar menuBar = new JMenuBar();
