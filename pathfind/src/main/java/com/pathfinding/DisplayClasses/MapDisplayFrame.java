@@ -102,10 +102,10 @@ public class MapDisplayFrame {
                 startPressed = false;
                 endPressed = false;
                 MapReader reader = new MapReader();
+                gMap = new GeneralMap(reader.readImageMap(folderPath));
                 locMapping = reader.getLocMapping();
                 vmMapping = reader.getVMMapping();
                 colorMapping = reader.getColorMapping();
-                gMap = new GeneralMap(reader.readImageMap(folderPath));
                 p = new PathFinder(gMap);
                 floors = new LinkedList<>();
     
@@ -186,10 +186,6 @@ public class MapDisplayFrame {
             int zValue = source.getZValue();
             int yValue = e.getY() / cellSize;
             int xValue = e.getX() / cellSize;
-
-            System.out.println(e.getPoint());
-            System.out.println(zValue + " " + xValue + " " + yValue);
-            System.out.println(gMap.getTile(zValue, yValue, xValue).getTileType());
 
             if (SwingUtilities.isLeftMouseButton(e)) {
                 //sets start location
