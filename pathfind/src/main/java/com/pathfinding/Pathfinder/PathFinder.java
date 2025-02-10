@@ -73,8 +73,10 @@ public class PathFinder {
      * @return list of nodes which is a path between two locations
      */
     public List<Node> pathfind(Location L1, int[] pos2) {
-        int[] entranceStart = ((LinkedList<int[]>) map.getCoords(L1)).get(0);
-        return pathfind(entranceStart, pos2);
+        List<int[]> entranceStart = ((LinkedList<int[]>) map.getCoords(L1));
+        List<int[]> endings = new ArrayList<>();
+        endings.add(pos2);
+        return pathfind(entranceStart, endings);
     }
 
     /**
@@ -99,10 +101,10 @@ public class PathFinder {
      * @return list of nodes representing the path
      */
     public List<Node> pathfind(int[] start, int[] end) {
-        List<int[]> endList = new LinkedList<>();
-        List<int[]> startList = new LinkedList<>();
+        List<int[]> endList = new ArrayList<>();
+        List<int[]> startList = new ArrayList<>();
         endList.add(end);
-        startList.add(end);
+        startList.add(start);
         return pathfind(startList, endList);
     }
 
