@@ -1,0 +1,250 @@
+@startuml
+
+'====================================
+' External / Library Classes (simplified)
+'====================================
+
+'====================================
+' Domain / Application Classes
+'====================================
+
+'------------ MapTile ------------
+class MapTile {
+  - passable : boolean
+  - selectable : boolean
+  - tileType : String
+  + MapTile()
+  + MapTile(passable: boolean, selectable: boolean, tileType: String)
+  + isPassable() : boolean
+  + isSelectable() : boolean
+  + getTileType() : String
+  + getLocation() : Location
+  + getConnected() : List<VerticalMoverTile>
+  + setConnected(connected: List<VerticalMoverTile>) : void
+}
+
+'------------ Node ------------
+class Node {
+  - x : int
+  - y : int
+  - z : int
+  - startCost : double
+  - endCost : double
+  - parent : Node
+  + Node(x: int, y: int, z: int)
+  + getTotalCost() : double
+  + equals(obj: Object) : boolean
+  + hashCode() : int
+  + getX() : int
+  + getY() : int
+  + getZ() : int
+  + getStartCost() : double
+  + getEndCost() : double
+  + getParent() : Node
+  + setStartCost(startCost: double) : void
+  + setEndCost(endCost: double) : void
+  + setParent(parent: Node) : void
+}
+
+'------------ GeneralMap ------------
+class GeneralMap {
+  - map : MapTile[][][]
+  - nameToEntrances : Map<String, List<int[]>>
+  - locToName : Map<Location, String>
+  - moverCoords : Map<MapTile, int[]>
+  + GeneralMap(gMap: MapTile[][][])
+  - constructCoords() : void
+  + getTile(z: int, y: int, x: int) : MapTile
+  + getMap() : MapTile[][][]
+  + getCoords(l1: Location) : List<int[]>
+  + getCoords(name: String) : List<int[]>
+  + getMoverCoords(tile: VerticalMoverTile) : int[]
+}
+GeneralMap ..> MapTile
+GeneralMap ..> Location
+GeneralMap ..> VerticalMoverTile
+
+'------------ MapReader ------------
+class MapReader {
+  - locMapping : TreeMap<String, Location>
+  - vmMapping : TreeMap<String, VerticalMoverTile>
+  - colorMapping : TreeMap<String, String>
+  + readImageMap(folderPath: String) : MapTile[][][] throws JsonProcessingException, IOException
+  + getVMMapping() : TreeMap<String, VerticalMoverTile>
+  + getLocMapping() : TreeMap<String, Location>
+  + getColorMapping() : TreeMap<String, String>
+  - locCreation(locations: JsonNode) : void
+  - vmCreation(vMovers: JsonNode) : void throws IOException
+}
+
+'------------ PathFinder ------------
+class PathFinder {
+  - map : GeneralMap
+  - {static, final} DIRECTIONS : int[][]
+  + PathFinder(map: GeneralMap)
+  + pathfind(L1: Location, L2: Location) : List<Node>
+  + pathfind(pos1: int[], L2: Location) : List<Node>
+  + pathfind(L1: Location, pos2: int[]) : List<Node>
+  + pathfind(S1: String, S2: String) : List<Node>
+  + pathfind(start: int[], end: int[]) : List<Node>
+  - pathfind(startings: List<int[]>, endings: List<int[]>) : List<Node>
+  - findNearestViableVerticalMover(pos: int[], floor: int) : VerticalMoverTile
+  - findAppropriateVerticalMoverPosition(v: VerticalMoverTile, pos: int[]) : int[]
+  - findPathByLayer(starts: List<Node>, endings: List<Node>, layer: int) : List<Node>
+  - {static} heuristic(a: Node, endings: List<Node>) : double
+  - {static} distance(a: Node, b: Node) : double
+  - {static} isValid(grid: MapTile[][], x: int, y: int, endings: List<Node>) : boolean
+  - {static} reconstructPath(end: Node) : List<Node>
+}
+PathFinder ..> GeneralMap
+PathFinder ..> Node
+PathFinder ..> MapTile
+PathFinder ..> VerticalMoverTile
+PathFinder ..> Location
+
+'------------ Time ------------
+class Time {
+  - minutes : Integer
+  + Time(minutes: int)
+  + Time(minAndHours: String)
+  + getTimeMinutes() : Integer
+  + setTimeMinutes(minutes: int) : void
+  + toString() : String
+}
+
+'------------ Location ------------
+class Location {
+  - name : String
+  - openTime : Time
+  - closeTime : Time
+  + Location(name: String, openTime: Time, closeTime: Time)
+  + getName() : String
+  + getOpenTime() : Time
+  + getCloseTime() : Time
+  + toString() : String
+}
+Location ..> Time
+
+'------------ LocationTile ------------
+class LocationTile {
+  - location : Location
+  + LocationTile(type: String, loc: Location)
+  + LocationTile(loc: Location)
+  + getLocation() : Location
+}
+LocationTile --|> MapTile
+LocationTile ..> Location
+
+'------------ Entrance ------------
+class Entrance {
+  + Entrance(loc: Location)
+}
+Entrance --|> LocationTile
+
+'------------ VerticalMoverTile ------------
+class VerticalMoverTile {
+  - connectedTiles : List<VerticalMoverTile>
+  + VerticalMoverTile(list: List<VerticalMoverTile>)
+  + getConnected() : List<VerticalMoverTile>
+  + setConnected(connected: List<VerticalMoverTile>) : void
+}
+VerticalMoverTile --|> MapTile
+
+'------------ WallTile ------------
+class WallTile {
+  + WallTile()
+}
+WallTile --|> MapTile
+
+'------------ InfoPanel ------------
+class InfoPanel {
+  - startCoordInfo : JLabel
+  - startTileInfo : JLabel
+  - endCoordInfo : JLabel
+  - endTileInfo : JLabel
+  + InfoPanel(startCoords: int[], endCoords: int[])
+  + setStartInfo(startCoords: int[], tile: MapTile) : void
+  + setEndInfo(endCoords: int[], tile: MapTile) : void
+}
+InfoPanel ..> MapTile
+
+'------------ MapDisplay ------------
+class MapDisplay {
+  - grid : MapTile[][]
+  - zValue : int
+  - path : List<Node>
+  - xSize : int
+  - ySize : int
+  - colorMapping : TreeMap<String, String>
+  - cellSize : int
+  - startCoords : int[]
+  - endCoords : int[]
+  + MapDisplay(grid: MapTile[][], path: List<Node>, xSize: int, ySize: int, colorMapping: TreeMap<String, String>, zValue: int)
+  + paintComponent(g: Graphics) : void
+  + getZValue() : int
+  + getScale() : int
+  + setPath(path: List<Node>) : void
+  + setStartCoords(startCoords: int[]) : void
+  + setEndCoords(endCoords: int[]) : void
+}
+MapDisplay ..> Node
+
+'------------ MapDisplayFrame ------------
+class MapDisplayFrame {
+  - folderPath : String
+  - startCoords : int[]
+  - endCoords : int[]
+  - locMapping : TreeMap<String, Location>
+  - vmMapping : TreeMap<String, VerticalMoverTile>
+  - colorMapping : TreeMap<String, String>
+  - gMap : GeneralMap
+  - p : PathFinder
+  - frame : JFrame
+  - infoPanel : InfoPanel
+  - viewerPanel : JPanel
+  - scroll : JScrollPane
+  - routeButton : JButton
+  - floors : List<MapDisplay>
+  - startPressed : boolean
+  - endPressed : boolean
+  + MapDisplayFrame(folderPath: String) throws IOException
+  + setFolderPath(folderPath: String) : void
+  + guiSetup() : void
+  - createInfoPanel() : void
+  - createviewerPanelPanel() : void
+}
+MapDisplayFrame ..> MapReader
+MapDisplayFrame ..> Location
+MapDisplayFrame ..> VerticalMoverTile
+MapDisplayFrame ..> GeneralMap
+MapDisplayFrame ..> PathFinder
+MapDisplayFrame ..> MapDisplay
+MapDisplayFrame ..> InfoPanel
+
+'------------ Inner Classes of MapDisplayFrame ------------
+class MapDisplayFrame_Listener {
+  + mouseClicked(e: MouseEvent) : void
+}
+MapDisplayFrame_Listener --|> MouseAdapter
+
+class MapDisplayFrame_Routing {
+  + actionPerformed(e: ActionEvent) : void
+}
+MapDisplayFrame_Routing --|> ActionListener
+
+'------------ Startup ------------
+class Startup {
+  + main(args: String[]) : void
+}
+Startup ..> MapDisplayFrame
+
+'====================================
+' Associations / Dependencies
+'====================================
+MapTile ..> Location
+MapTile ..> VerticalMoverTile 
+GeneralMap ..> MapTile
+GeneralMap ..> Location
+GeneralMap ..> VerticalMoverTile
+
+@enduml
