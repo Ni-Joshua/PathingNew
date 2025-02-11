@@ -241,8 +241,10 @@ public class PathFinder {
         Node start = new Node(0, 0, 0);
         double startingHeuristic = Double.MAX_VALUE;
         for (Node n : starts){
-            if (heuristic(n, endings)<startingHeuristic){
+            double currentHeuristic = heuristic(n, endings);
+            if (currentHeuristic<startingHeuristic){
                 start = n;
+                startingHeuristic = currentHeuristic;
             }
         }
 

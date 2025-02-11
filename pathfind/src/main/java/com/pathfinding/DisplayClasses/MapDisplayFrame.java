@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -35,9 +35,9 @@ public class MapDisplayFrame {
     private String folderPath;
     private int[] startCoords;
     private int[] endCoords;
-    private TreeMap<String, Location> locMapping;
-    private TreeMap<String, VerticalMoverTile> vmMapping;
-    private TreeMap<String, String> colorMapping;
+    private Map<String, Location> locMapping;
+    private Map<String, VerticalMoverTile> vmMapping;
+    private Map<String, String> colorMapping;
     private GeneralMap gMap;
     private PathFinder p;
     private JFrame frame;

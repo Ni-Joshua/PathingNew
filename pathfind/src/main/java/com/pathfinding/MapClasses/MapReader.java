@@ -4,9 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -30,9 +31,9 @@ import com.pathfinding.MapClasses.MapMats.WallTile;
  */
 public class MapReader {
     //Maps that store key information from the Json File
-    private TreeMap<String, Location> locMapping;
-    private TreeMap<String, VerticalMoverTile> vmMapping;
-    private TreeMap<String, String> colorMapping;
+    private Map<String, Location> locMapping;
+    private Map<String, VerticalMoverTile> vmMapping;
+    private Map<String, String> colorMapping;
 
     /**
      * Constructs 3D array of MapTiles from a given folder
@@ -58,7 +59,7 @@ public class MapReader {
 
         locCreation(locations);
         vmCreation(vMovers);
-        colorMapping = new TreeMap<>();
+        colorMapping = new HashMap<>();
 
         JsonNode colorMap = info.get("ColorMapping");
 
@@ -114,7 +115,7 @@ public class MapReader {
      * Returns map between VerticalMover String IDs and their object form
      * @return vmMapping
      */
-    public TreeMap<String, VerticalMoverTile> getVMMapping() {
+    public Map<String, VerticalMoverTile> getVMMapping() {
         return vmMapping;
     }
 
@@ -122,7 +123,7 @@ public class MapReader {
      * Returns map between Location String IDs and their object form
      * @return locMapping
      */
-    public TreeMap<String, Location> getLocMapping() {
+    public Map<String, Location> getLocMapping() {
         return locMapping;
     }
 
@@ -130,7 +131,7 @@ public class MapReader {
      * Returns map between String IDs to Hexadecimal color
      * @return
      */
-    public TreeMap<String, String> getColorMapping() {
+    public Map<String, String> getColorMapping() {
         return colorMapping;
     }
 
@@ -139,7 +140,7 @@ public class MapReader {
      * @param locations JsonNode of Location information
      */
     private void locCreation(JsonNode locations) {
-        locMapping = new TreeMap<>();
+        locMapping = new HashMap<>();
         for (Iterator<String> it = locations.fieldNames(); it.hasNext();) {
             String locID = it.next();
             JsonNode loc = locations.get(locID);
@@ -155,7 +156,7 @@ public class MapReader {
      * @throws IOException
      */
     private void vmCreation(JsonNode vMovers) throws IOException {
-        vmMapping = new TreeMap<>();
+        vmMapping = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader reader = mapper.readerFor(new TypeReference<List<String>>() {});
         //creates new VerticalMoverTiles to make the objects exist
