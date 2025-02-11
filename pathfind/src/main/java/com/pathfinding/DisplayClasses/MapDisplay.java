@@ -72,6 +72,7 @@ public class MapDisplay extends JPanel{
                     case "location":
                     case "entrance":
                         hex = colorMapping.get(tile.getLocation().getName());
+                        // System.out.println(tileType + " " + hex + " " + tile.getLocation().getName());
                         break;
                     case "verticalmover":
                         hex = "FFC0CB";
@@ -80,7 +81,7 @@ public class MapDisplay extends JPanel{
                         hex = colorMapping.get(tileType);
                         break;
                 }
-
+                
                 int red = Integer.parseInt(hex.substring(0, 2), 16);
                 int green = Integer.parseInt(hex.substring(2, 4), 16);
                 int blue = Integer.parseInt(hex.substring(4, 6), 16);

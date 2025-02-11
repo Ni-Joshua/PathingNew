@@ -16,27 +16,27 @@
             "closeTime": "10:00"
         },
         "dh": {
-            "name": "dah",
+            "name": "dh",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "eh": {
-            "name": "eah",
+            "name": "eh",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "fh": {
-            "name": "fah",
+            "name": "fh",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "gh": {
-            "name": "gah",
+            "name": "gh",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hh": {
-            "name": "hah",
+            "name": "hh",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
@@ -51,57 +51,57 @@
             "closeTime": "10:00"
         },
         "hb": {
-            "name": "ahb",
+            "name": "hb",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hc": {
-            "name": "ahc",
+            "name": "hc",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hd": {
-            "name": "ahd",
+            "name": "hd",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "he": {
-            "name": "ahe",
+            "name": "he",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hf": {
-            "name": "ahf",
+            "name": "hf",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hg": {
-            "name": "ahg",
+            "name": "hg",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hhh": {
-            "name": "ahh",
+            "name": "hhh",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hha": {
-            "name": "aha",
+            "name": "hha",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hhb": {
-            "name": "ahb",
+            "name": "hhb",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hhc": {
-            "name": "ahc",
+            "name": "hhc",
             "openTime": "8:00",
             "closeTime": "10:00"
         },
         "hhd": {
-            "name": "ahd",
+            "name": "hhd",
             "openTime": "8:00",
             "closeTime": "10:00"
         }
