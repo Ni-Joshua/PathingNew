@@ -3,11 +3,11 @@ package com.pathfinding.DisplayClasses;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GradientPaint;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -28,8 +28,8 @@ public class MapDisplay extends JPanel{
     private List<Node> path;
     private int xSize;
     private int ySize;
-    //TreeMap from tileType/name to hexadecimal color value
-    private TreeMap<String, String> colorMapping;
+    //Map from tileType/name to hexadecimal color value
+    private Map<String, String> colorMapping;
     private int cellSize;
     private int[] startCoords;
     private int[] endCoords;
@@ -43,7 +43,7 @@ public class MapDisplay extends JPanel{
      * @param colorMapping map between tileType/Name to hexadecimal color value
      * @param zValue floor
      */
-    public MapDisplay(MapTile[][] grid, List<Node> path,int xSize, int ySize, TreeMap<String, String> colorMapping, int zValue){
+    public MapDisplay(MapTile[][] grid, List<Node> path,int xSize, int ySize, Map<String, String> colorMapping, int zValue){
         this.grid = grid;
         this.path = path;
         this.xSize = xSize;
