@@ -87,21 +87,7 @@ public class MapReader {
                         gMap[z][y][x] = new LocationTile(locMapping.get(tileType));
                     }
                     
-                    //Storing String ID to Hexadecimal color code information in colorMapping, entrances will be colored the same as location tiles
-                    // if (!tileType.contains(" ") && !colorMapping.containsKey(tileType)){
-                    //     String key = "";
-                    //     if (tileType.equals("wall")){
-                    //         key = "wall";
-                    //     }
-                    //     else if (tileType.equals("blank")){
-                    //         key = "blank";
-                    //     }
-                    //     else{
-                    //         key = locMapping.get(tileType).getName();
-                    //         // System.out.println(key);
-                    //     }
-                    //     colorMapping.put(key, hex);
-                    // }
+                    //Storing String ID to Hexadecimal color code information in colorMapping
                     if (!colorMapping.containsKey(tileType)){
                             String key = "";
                             if (tileType.equals("wall")){
@@ -110,21 +96,20 @@ public class MapReader {
                             else if (tileType.equals("blank")){
                                 key = "blank";
                             }
-                            else{
-                                if (tileType.contains(" ")){
-                                        colorMapping.put(tileType, hex);
-                                    }
-                                else{
-                                    key = locMapping.get(tileType).getName();
+                            else if (tileType.contains(" ")){
+                                key = tileType.substring(0, tileType.indexOf(" "));
+                                if ("ent".equals(key)){
+                                    key += " " + locMapping.get(tileType.substring(tileType.indexOf(" ")+1)).getName();
                                 }
+                                else{
+                                    key = tileType;
+                                }
+                            }
+                            else{
+                                key = locMapping.get(tileType).getName();
                             }
                             colorMapping.put(key, hex);
                         }
-                    /*Check for entrances that do not have location tiles associated with them (usually entrance of building) */
-                    // if (tileType.contains(" ") && tileType.substring(0, tileType.indexOf(" ")).equals("ent") && !colorMapping.containsKey(tileType.substring(tileType.indexOf(" ") + 1))){
-                    //     colorMapping.put(tileType.substring(tileType.indexOf(" ") + 1), hex);
-                    //     System.out.println(colorMapping.get(tileType.substring(tileType.indexOf(" ") + 1)));
-                    // }
                 }
             }
         }

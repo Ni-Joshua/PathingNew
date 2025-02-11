@@ -72,7 +72,10 @@ public class MapDisplay extends JPanel{
                     case "location":
                     case "entrance":
                         hex = colorMapping.get(tile.getLocation().getName());
-                        // System.out.println(tileType + " " + hex + " " + tile.getLocation().getName());
+                        //If location tiles for the entrance do not exist
+                        if (hex == null){
+                            hex = colorMapping.get("ent " + tile.getLocation().getName());
+                        }
                         break;
                     case "verticalmover":
                         hex = "FFC0CB";
@@ -81,7 +84,7 @@ public class MapDisplay extends JPanel{
                         hex = colorMapping.get(tileType);
                         break;
                 }
-                
+
                 int red = Integer.parseInt(hex.substring(0, 2), 16);
                 int green = Integer.parseInt(hex.substring(2, 4), 16);
                 int blue = Integer.parseInt(hex.substring(4, 6), 16);
@@ -97,13 +100,13 @@ public class MapDisplay extends JPanel{
             GradientPaint gradient;
             int colorStep = 255/path.size();
             g2d.setColor(new Color(0, 0, 255));
-            int pixWidth = (int) Math.ceil(cellSize/2.0);
+            int pixWidth = (int) Math.ceil(cellSize/1.5);
             g2d.setStroke(new BasicStroke(pixWidth));
             for (int i = 0; i< path.size()-1; i++) {
                 if (path.get(i).getZ() == zValue && path.get(i+1).getZ() == zValue){
                     gradient = new GradientPaint(path.get(i).getX(), path.get(i).getY(), new Color(0, i*colorStep, 255), path.get(i+1).getX(), path.get(i+1).getY(), new Color(0, (i+1)*colorStep, 255));
                     g2d.setPaint(gradient);
-                    g2d.drawLine(path.get(i).getX()*cellSize + pixWidth, path.get(i).getY()*cellSize + pixWidth, path.get(i+1).getX()*cellSize + pixWidth, path.get(i+1).getY()*cellSize + pixWidth);
+                    g2d.drawLine(path.get(i).getX()*cellSize + cellSize/2, path.get(i).getY()*cellSize + cellSize/2, path.get(i+1).getX()*cellSize + cellSize/2, path.get(i+1).getY()*cellSize + cellSize/2);
                 }   
             }
         }
