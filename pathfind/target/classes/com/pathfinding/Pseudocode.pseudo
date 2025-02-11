@@ -1,0 +1,462 @@
+//---------------------------------------------
+// MAIN APPLICATION ENTRY POINT (Startup)
+//---------------------------------------------
+Class Startup:
+    Method main(args: String[]):
+        Try:
+            // Create the main display frame (using a folder path for map files)
+            displayFrame ← new MapDisplayFrame(folderPath)
+            // Setup and display the GUI
+            displayFrame.guiSetup()
+        Catch Exception ex:
+            Print "Error: " + ex
+
+
+//--------------------------------------------------------
+// GUI FRAME THAT HOLDS THE MAP AND CONTROLS PATHFINDING
+//--------------------------------------------------------
+Class MapDisplayFrame:
+    // Attributes (simplified)
+    Attribute folderPath: String
+    Attribute gMap: GeneralMap
+    Attribute pathFinder: PathFinder
+    Attribute frame: JFrame
+    Attribute infoPanel: InfoPanel
+    Attribute viewerPanel: JPanel
+    Attribute routeButton: JButton
+    Attribute floors: List<MapDisplay>
+    Attribute startCoords: int[]
+    Attribute endCoords: int[]
+    // Additional attributes: locMapping, vmMapping, colorMapping, etc.
+
+    Constructor(folderPath: String):
+        this.folderPath ← folderPath
+        // Read map data from folder
+        mapReader ← new MapReader()
+        map3DArray ← mapReader.readImageMap(folderPath)
+        gMap ← new GeneralMap(map3DArray)
+        // Save the mappings (locations, vertical movers, color mapping)
+        locMapping ← mapReader.getLocMapping()
+        vmMapping ← mapReader.getVMMapping()
+        colorMapping ← mapReader.getColorMapping()
+        // Instantiate the pathfinder with the map
+        pathFinder ← new PathFinder(gMap)
+        // Initialize GUI components (frame, panels, buttons, etc.)
+        Initialize frame, viewerPanel, infoPanel, routeButton, and floors list
+
+    Method guiSetup():
+        // Set up frame layout and add components
+        Setup frame layout
+        Add infoPanel and viewerPanel (which holds a MapDisplay for each floor)
+        Add routeButton to frame
+        // Attach event listeners:
+        Attach a MouseAdapter (MapDisplayFrame_Listener) to viewerPanel:
+            // On mouse clicks, set startCoords or endCoords and update infoPanel
+        Attach an ActionListener (MapDisplayFrame_Routing) to routeButton:
+            // When pressed, use pathFinder to compute a path between startCoords and endCoords
+            // Then update the appropriate MapDisplay with the computed path
+        Display the frame
+
+
+//--------------------------------------------------------------
+// CLASS RESPONSIBLE FOR READING AND CONSTRUCTING THE MAP DATA
+//--------------------------------------------------------------
+Class MapReader:
+    Attribute locMapping: TreeMap<String, Location>
+    Attribute vmMapping: TreeMap<String, VerticalMoverTile>
+    Attribute colorMapping: TreeMap<String, String>
+
+    Method readImageMap(folderPath: String) returns MapTile[][][]:
+        // Locate floor plan image files in folderPath
+        floorPlans ← list of image files from (folderPath + "/Floors")
+        depth ← number of floorPlans
+        (width, height) ← dimensions of first floor image
+        Initialize 3D array gMap[depth][height][width]
+        // Read additional JSON file (floorInfo.json) for tile mappings
+        infoJSON ← read JSON from (folderPath + "/floorInfo.json")
+        // Create mappings for locations and vertical movers
+        Call locCreation(infoJSON["LocMapping"])
+        Call vmCreation(infoJSON["VMmapping"])
+        // Process each floor image:
+        For z from 0 to depth-1:
+            currentFloorImage ← load image floorPlans[z]
+            For y from 0 to height-1:
+                For x from 0 to width-1:
+                    rgbValue ← currentFloorImage.getRGB(x, y)
+                    hexColor ← convert rgbValue to uppercase 6-digit hex string
+                    tileType ← infoJSON["ColorMapping"][hexColor].textValue
+                    If tileType equals "wall":
+                        gMap[z][y][x] ← new WallTile()
+                    Else if tileType equals "blank":
+                        gMap[z][y][x] ← new MapTile()
+                    Else if tileType indicates an entrance (e.g., starts with "ent"):
+                        locationKey ← extract key from tileType
+                        gMap[z][y][x] ← new Entrance(locMapping.get(locationKey))
+                    Else if tileType indicates a vertical mover (e.g., starts with "vm"):
+                        vmKey ← extract key from tileType
+                        gMap[z][y][x] ← vmMapping.get(vmKey)
+                    Else:
+                        // Assume it is a location tile
+                        gMap[z][y][x] ← new LocationTile(locMapping.get(tileType))
+                    // Update colorMapping with tileType and hexColor if not already present
+                    Update colorMapping as needed
+        Return gMap
+
+    Method getVMMapping() returns TreeMap<String, VerticalMoverTile>:
+        Return vmMapping
+
+    Method getLocMapping() returns TreeMap<String, Location>:
+        Return locMapping
+
+    Method getColorMapping() returns TreeMap<String, String>:
+        Return colorMapping
+
+    Method locCreation(locationsJSON: JsonNode):
+        For each key in locationsJSON:
+            locData ← locationsJSON[key]
+            Create new Location with:
+                name ← locData["name"]
+                openTime ← new Time(locData["openTime"])
+                closeTime ← new Time(locData["closeTime"])
+            locMapping.put(key, new Location(...))
+
+    Method vmCreation(vMoversJSON: JsonNode):
+        For each key in vMoversJSON:
+            // Create initial VerticalMoverTile without connected tiles
+            vmMapping.put(key, new VerticalMoverTile(null))
+        For each key in vMoversJSON:
+            connectedIDs ← read connected tile IDs from vMoversJSON[key]["connectedTiles"]
+            connectedList ← new empty List<VerticalMoverTile>
+            For each id in connectedIDs:
+                connectedList.add(vmMapping.get(id))
+            vmMapping.get(key).setConnected(connectedList)
+
+
+/////////////////////////////////////////////////////
+// CLASS THAT STORES THE MAP (MULTI-LEVEL GRID)
+/////////////////////////////////////////////////////
+Class GeneralMap:
+    Attribute map: MapTile[][][]
+    Attribute nameToEntrances: Map<String, List<int[]>>
+    Attribute locToName: Map<Location, String>
+    Attribute moverCoords: Map<MapTile, int[]>
+
+    Constructor(gMap: MapTile[][][]):
+        this.map ← gMap
+        Call constructCoords()
+
+    Method constructCoords():
+        For each floor z, row y, column x in map:
+            tile ← map[z][y][x]
+            If tile is an Entrance or a LocationTile:
+                // Map the tile’s location (or its name) to its coordinates
+                Update nameToEntrances and locToName accordingly
+            If tile is a VerticalMoverTile:
+                moverCoords.put(tile, [z, y, x])
+
+    Method getTile(z: int, y: int, x: int) returns MapTile:
+        Return map[z][y][x]
+
+    Method getMap() returns MapTile[][][]:
+        Return map
+
+    Method getCoords(location: Location) returns List<int[]>:
+        Return nameToEntrances.get(locToName.get(location))
+
+    Method getCoords(name: String) returns List<int[]>:
+        Return nameToEntrances.get(name)
+
+    Method getMoverCoords(tile: VerticalMoverTile) returns int[]:
+        Return moverCoords.get(tile)
+
+
+/////////////////////////////////////////////////////
+// PATHFINDER CLASS USING A* ALGORITHM TO FIND PATH
+/////////////////////////////////////////////////////
+Class PathFinder:
+    Attribute map: GeneralMap
+    Constant DIRECTIONS: int[][] = [ [0,1], [1,0], [0,-1], [-1,0],
+                                      [1,1], [1,-1], [-1,1], [-1,-1] ]
+
+    Constructor(map: GeneralMap):
+        this.map ← map
+
+    // Overloaded public methods to convert various input types to coordinate lists
+    Method pathfind(L1: Location, L2: Location) returns List<Node>:
+        startCoordsList ← map.getCoords(L1)
+        endCoordsList ← map.getCoords(L2)
+        Return pathfind(startCoordsList, endCoordsList)
+
+    Method pathfind(pos1: int[], L2: Location) returns List<Node>:
+        startCoordsList ← list containing pos1
+        endCoordsList ← map.getCoords(L2)
+        Return pathfind(startCoordsList, endCoordsList)
+
+    Method pathfind(L1: Location, pos2: int[]) returns List<Node>:
+        startCoordsList ← map.getCoords(L1)
+        endCoordsList ← list containing pos2
+        Return pathfind(startCoordsList, endCoordsList)
+
+    Method pathfind(S1: String, S2: String) returns List<Node>:
+        startCoordsList ← map.getCoords(S1)
+        endCoordsList ← map.getCoords(S2)
+        Return pathfind(startCoordsList, endCoordsList)
+
+    Method pathfind(start: int[], end: int[]) returns List<Node>:
+        // Convert start and end into single-element lists and call the next method
+        Return pathfind([start], [end])
+
+    // Private method that does the main pathfinding work
+    Private Method pathfind(startings: List<int[]>, endings: List<int[]>) returns List<Node>:
+        Initialize totalPath as empty List<Node>
+        Convert each int[] in startings into a Node (using x, y, z)
+        If startings and endings are on different floors:
+            mover ← findNearestViableVerticalMover(startings[0], targetFloor from endings)
+            intermediateStartCoords ← findAppropriateVerticalMoverPosition(mover, startings[0])
+            pathSegment1 ← findPathByLayer(startNodes, [Node(intermediateStartCoords)], current floor)
+            Append pathSegment1 to totalPath
+            intermediateEndCoords ← findAppropriateVerticalMoverPosition(mover, endings[0])
+            pathSegment2 ← findPathByLayer([Node(intermediateEndCoords)], endNodes, target floor)
+            Append pathSegment2 to totalPath
+        Else:
+            totalPath ← findPathByLayer(startNodes, endNodes, current floor)
+        Return totalPath
+
+    Private Method findPathByLayer(starts: List<Node>, endings: List<Node>, layer: int) returns List<Node>:
+        Initialize priority queue “unexplored” (ordered by Node.getTotalCost())
+        Initialize empty set “explored”
+        Choose a start Node with the lowest heuristic cost
+        Set its startCost to 0 and endCost using heuristic(start, endings)
+        Add it to unexplored
+        While unexplored is not empty:
+            current ← unexplored.poll()
+            If current is in endings:
+                Return reconstructPath(current)
+            Add current to explored
+            For each direction in DIRECTIONS:
+                newX ← current.x + direction[0]
+                newY ← current.y + direction[1]
+                If (newX, newY) is valid and Node(newX, newY, layer) not in explored:
+                    neighbor ← new Node(newX, newY, layer)
+                    tentativeCost ← current.startCost + distance(current, neighbor)
+                    If tentativeCost < neighbor.startCost OR neighbor not in unexplored:
+                        neighbor.startCost ← tentativeCost
+                        neighbor.endCost ← heuristic(neighbor, endings)
+                        neighbor.parent ← current
+                        Add neighbor to unexplored if not already present
+        Return empty list  // No valid path found
+
+    Private Static Method heuristic(a: Node, endings: List<Node>) returns double:
+        For each end in endings:
+            Compute ManhattanDistance = |a.x - end.x| + |a.y - end.y|
+        Return the minimum ManhattanDistance
+
+    Private Static Method distance(a: Node, b: Node) returns double:
+        Return Euclidean distance between a and b
+
+    Private Static Method isValid(grid: MapTile[][], x: int, y: int, endings: List<Node>) returns boolean:
+        Return true if (x, y) is within grid bounds AND
+               (grid[y][x] is passable OR (grid[y][x] is a vertical mover AND (x, y) matches one of the end Nodes))
+
+    Private Static Method reconstructPath(endNode: Node) returns List<Node>:
+        Initialize path as empty list
+        current ← endNode
+        While current is not null:
+            Prepend current to path
+            current ← current.parent
+        Return path
+
+    Private Method findNearestViableVerticalMover(pos: int[], targetFloor: int) returns VerticalMoverTile:
+        Initialize a sorted mapping of distance → VerticalMoverTile
+        For each tile on current floor in map.getMap()[pos[0]]:
+            If tile’s type is "verticalmover":
+                Compute distance from pos to tile’s coordinates
+                Add (distance, tile) to mapping
+        While mapping is not empty:
+            candidate ← mapping.getFirstEntry().value
+            For each connected mover in candidate.getConnected():
+                If map.getMoverCoords(connected mover)[0] equals targetFloor:
+                    Return candidate
+            Remove candidate from mapping
+        Return null
+
+    Private Method findAppropriateVerticalMoverPosition(v: VerticalMoverTile, pos: int[]) returns int[]:
+        connectedList ← v.getConnected() plus v itself
+        For each tile in connectedList:
+            coords ← map.getMoverCoords(tile)
+            If coords[0] equals pos[0]:
+                Return coords
+        Return default coordinates (if not found)
+
+
+//////////////////////////////////////////////////////////////
+// SUPPORTING CLASSES: Node, MapDisplay, InfoPanel, etc.
+//////////////////////////////////////////////////////////////
+
+// Node: Represents a point in the grid with associated costs and a parent pointer.
+Class Node:
+    Attributes:
+        x, y, z: int
+        startCost, endCost: double
+        parent: Node
+    Constructor(x: int, y: int, z: int):
+        Set x, y, z and initialize startCost and endCost (e.g., to MAX_VALUE)
+    Method getTotalCost() returns double:
+        Return startCost + endCost
+    // Additional methods: equals(), hashCode(), getters, setters
+
+// MapDisplay: A JPanel that draws a floor's grid and any computed path.
+Class MapDisplay (extends JPanel):
+    Attributes:
+        grid: MapTile[][]
+        zValue: int          // floor number
+        path: List<Node>
+        xSize, ySize: int
+        colorMapping: TreeMap<String, String>
+        cellSize: int
+        startCoords, endCoords: int[]
+    Constructor(grid: MapTile[][], path: List<Node>, xSize: int, ySize: int, colorMapping: TreeMap<String, String>, zValue: int):
+        Initialize attributes accordingly
+    Method paintComponent(g: Graphics):
+        For each cell in grid:
+            Draw the cell using its color from colorMapping
+        If path is non-empty:
+            Draw the computed path over the grid
+    Methods:
+        setPath(path: List<Node>)
+        setStartCoords(startCoords: int[])
+        setEndCoords(endCoords: int[])
+        getZValue() returns int
+        getScale() returns int
+
+// InfoPanel: Displays textual information about selected start/end tiles.
+Class InfoPanel (extends JPanel):
+    Attributes:
+        startCoordInfo, startTileInfo, endCoordInfo, endTileInfo: JLabel
+    Constructor(startCoords: int[], endCoords: int[]):
+        Initialize labels with the provided coordinate information
+    Method setStartInfo(startCoords: int[], tile: MapTile):
+        Update startCoordInfo and startTileInfo based on tile details
+    Method setEndInfo(endCoords: int[], tile: MapTile):
+        Update endCoordInfo and endTileInfo based on tile details
+
+
+////////////////////////////////////////////////////
+// OTHER CLASSES (defined similarly)              
+////////////////////////////////////////////////////
+
+// MapTile: Represents a single tile on the map.
+Class MapTile:
+    Attributes:
+        passable: boolean
+        selectable: boolean
+        tileType: String
+    Constructors:
+        MapTile()   // Default: passable = true, selectable = true, tileType = "blank"
+        MapTile(passable: boolean, selectable: boolean, tileType: String)
+    Methods:
+        isPassable() returns boolean
+        isSelectable() returns boolean
+        getTileType() returns String
+        getLocation() returns Location    // Default returns null; overridden in subclasses
+        getConnected() returns List<VerticalMoverTile>   // Default returns null
+        setConnected(connected: List<VerticalMoverTile>)   // Default does nothing
+
+// LocationTile: Represents a tile associated with a specific location.
+Class LocationTile (extends MapTile):
+    Attribute:
+        location: Location
+    Constructors:
+        LocationTile(type: String, loc: Location):
+            Call super(true, true, type)
+            Set location ← loc
+        LocationTile(loc: Location):
+            Call super(true, true, "location")
+            Set location ← loc
+    Method getLocation() returns Location:
+        Return location
+
+// Entrance: Represents an entrance tile to a location.
+Class Entrance (extends LocationTile):
+    Constructor(loc: Location):
+        Call super("entrance", loc)
+
+// VerticalMoverTile: Represents a tile that allows vertical movement (e.g., elevator).
+Class VerticalMoverTile (extends MapTile):
+    Attribute:
+        connectedTiles: List<VerticalMoverTile>
+    Constructor(list: List<VerticalMoverTile>):
+        Call super(false, true, "verticalmover")
+        Set connectedTiles ← list
+    Method getConnected() returns List<VerticalMoverTile>:
+        Return connectedTiles
+    Method setConnected(connected: List<VerticalMoverTile>):
+        Set connectedTiles ← connected
+
+// WallTile: Represents an impassable wall.
+Class WallTile (extends MapTile):
+    Constructor():
+        Call super(false, false, "wall")
+
+// Time: Represents a time value stored in minutes.
+Class Time:
+    Attribute:
+        minutes: Integer
+    Constructors:
+        Time(minutes: int):
+            Set minutes ← minutes
+        Time(minAndHours: String):
+            Parse the "hh:mm" formatted string and set minutes accordingly
+    Methods:
+        getTimeMinutes() returns Integer:
+            Return minutes
+        setTimeMinutes(minutes: int):
+            Set minutes ← minutes
+        toString() returns String:
+            Return time formatted as "h:mm"
+
+// Location: Represents a named location with opening and closing times.
+Class Location:
+    Attributes:
+        name: String
+        openTime: Time
+        closeTime: Time
+    Constructor(name: String, openTime: Time, closeTime: Time):
+        Set name, openTime, closeTime accordingly
+    Methods:
+        getName() returns String:
+            Return name
+        getOpenTime() returns Time:
+            Return openTime
+        getCloseTime() returns Time:
+            Return closeTime
+        toString() returns String:
+            Return a string including name, openTime, and closeTime
+
+
+////////////////////////////////////////////////////
+// EVENT HANDLERS FOR INTERACTIVITY IN THE GUI
+////////////////////////////////////////////////////
+Class MapDisplayFrame_Listener (extends MouseAdapter):
+    Method mouseClicked(event: MouseEvent):
+        clickedCoords ← calculate coordinates from event
+        If startCoords is not yet set:
+            Set startCoords ← clickedCoords
+            infoPanel.setStartInfo(clickedCoords, corresponding tile)
+            Mark startPressed as true
+        Else if endCoords is not yet set:
+            Set endCoords ← clickedCoords
+            infoPanel.setEndInfo(clickedCoords, corresponding tile)
+            Mark endPressed as true
+        Else:
+            // Optionally, reset selection or update existing coordinates
+
+Class MapDisplayFrame_Routing (implements ActionListener):
+    Method actionPerformed(event: ActionEvent):
+        If startCoords and endCoords are set:
+            computedPath ← pathFinder.pathfind(startCoords, endCoords)
+            For each MapDisplay in floors:
+                If MapDisplay corresponds to the floor of the path:
+                    MapDisplay.setPath(computedPath)
+                    MapDisplay.repaint()  // Trigger redraw to show the new path
+            Optionally update infoPanel or other UI elements

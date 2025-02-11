@@ -1,0 +1,230 @@
+{
+    "LocMapping": {
+        "ah": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "bh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "ch": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "dh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "eh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "fh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "gh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "field": {
+            "name": "Field",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "ha": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hb": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hc": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hd": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "he": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hf": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hg": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hhh": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hha": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hhb": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hhc": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        },
+        "hhd": {
+            "name": "ah",
+            "openTime": "8:00",
+            "closeTime": "10:00"
+        }
+    },
+    "VMmapping": {
+        "vm1": {
+            "connectedTiles": [
+                "vm5", "vm9"
+            ]
+        },
+        "vm2": {
+            "connectedTiles": [
+                "vm6", "vm10"
+            ]
+        },
+        "vm3": {
+            "connectedTiles": [
+                "vm7", "vm11"
+            ]
+        },
+        "vm4": {
+            "connectedTiles": [
+                "vm8", "vm12"
+            ]
+        },
+        "vm5": {
+            "connectedTiles": [
+                "vm1", "vm9"
+            ]
+        },
+        "vm6": {
+            "connectedTiles": [
+                "vm2", "vm10"
+            ]
+        },
+        "vm7": {
+            "connectedTiles": [
+                "vm3", "vm11"
+            ]
+        },
+        "vm8": {
+            "connectedTiles": [
+                "vm4", "vm12"
+            ]
+        },
+        "vm9": {
+            "connectedTiles": [
+                "vm1", "vm5"
+            ]
+        },
+        "vm10": {
+            "connectedTiles": [
+                "vm2", "vm6"
+            ]
+        },
+        "vm11": {
+            "connectedTiles": [
+                "vm3", "vm7"
+            ]
+        },
+        "vm12": {
+            "connectedTiles": [
+                "vm4", "vm8"
+            ]
+        }
+    },
+    "ColorMapping": {
+        "000000": "wall",
+        "FFFFFF": "blank",
+        "FFF200": "ent ah",
+        "FFF9BD": "ent bh",
+        "709AD1": "ent ch",
+        "2F3699": "ent dh",
+        "4D6DF3": "ent eh",
+        "99D9EA": "ent fh",
+        "22B14C": "ent gh",
+        "D3F9BC": "ent hh",
+        "FFEB3B": "ent ha",
+        "FFC107": "ent hb",
+        "FF9800": "ent hc",
+        "FF5722": "ent hd",
+        "795548": "ent he",
+        "9E9E9E": "ent hf",
+        "FFEBEE": "ent hg",
+        "607D8B": "ent hhh",
+        "FF5252": "ent hha",
+        "FF1744": "ent hhb",
+        "D50000": "ent hhc",
+        "FF8A80": "ent hhd",
+        "00B7EF": "ent field",
+        "990030": "ah",
+        "9C5A3C": "bh",
+        "FFC20E": "ch",
+        "F5E49C": "dh",
+        "E5AA7A": "eh",
+        "FF7E00": "fh",
+        "FFA3B1": "gh",
+        "ED1C24": "hh",
+        "3F51B5": "ha",
+        "2196F3": "hb",
+        "03A9F4": "hc",
+        "00BCD4": "hd",
+        "009688": "he",
+        "4CAF50": "hf",
+        "CDDC39": "hg",
+        "8BC34A": "hhh",
+        "EF5350": "hha",
+        "E53935": "hhb",
+        "D32F2F": "hhc",
+        "E57373": "hhd",
+        "A8E61D": "field",
+        "E91E63": "vm vm1",
+        "9C27B0": "vm vm2",
+        "673AB7": "vm vm3",
+        "F44336": "vm vm4",
+        "006064": "vm vm5",
+        "84FFFF": "vm vm6",
+        "18FFFF": "vm vm7",
+        "00E5FF": "vm vm8",
+        "388E3C": "vm vm9",
+        "2E7D32": "vm vm10",
+        "1B5E20": "vm vm11",
+        "B9F6CA": "vm vm12"
+
+    }
+}
