@@ -213,17 +213,6 @@ public class PathFinder {
         return correct;
     }
 
-    // /**
-    //  * Path Not Found Exception, thrown when path is not found
-    //  */
-    // class PathNotFoundException extends Exception {
-    //     public PathNotFoundException() {
-    //     }
-    //     public PathNotFoundException(String message) {
-    //         super(message);
-    //     }
-    // }
-
     /**
      * Pathfinds between a starting node and the closest of a list of ending nodes
      * using the A* algorithm
